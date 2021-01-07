@@ -1,10 +1,8 @@
-import sys
 import time
 import logging
 import shutil
 import parse_config
 import os
-import hashlib
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
 from datetime import date, datetime
@@ -14,8 +12,6 @@ from threading import Thread
 configuration = parse_config.ConfPacket()
 configs = configuration.load_config('SYNC_FOLDERS, LOG_FOLDER, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX')
 
-files_destination_md5=dict()
-files_source_md5=dict()
 metric_value = 0
 
 class Waiter(Thread):
@@ -41,25 +37,29 @@ def adiciona_linha_log(texto):
     try:
         log_file = configs['LOG_FOLDER']['log_folder']+'log'+mes_ano+'.txt'
         f = open(log_file, "a")
-        f.write(dataFormatada + texto +"\n")
+        f.write(dataFormatada + ' ' + texto +"\n")
         f.close()
     except Exception as err:
         print(dataFormatada, err)
         
 def getfilename(filepath):
-    pathlist = filepath.split('\\')
-    filename = (pathlist[len(pathlist)-1])
-    return (filename)
-
+    try:
+        pathlist = filepath.split('\\')
+        filename = (pathlist[len(pathlist)-1])
+        return (filename)
+    except Exception as Err:
+        adiciona_linha_log(str(Err)+'Getfilename')
 
 def filetree(source, dest, sync_name):
+    files_destination_md5=dict()
+    files_source_md5=dict()
     try: 
         sync_ext = configs['SYNC_EXTENSIONS'][sync_name].split(", ")
     except:
         sync_ext = []
 
-    files_destination_md5.clear()
-    files_source_md5.clear()
+    #files_destination_md5.clear()
+    #files_source_md5.clear()
     
     try:
         debug = 'scan dest'
@@ -96,11 +96,11 @@ def filetree(source, dest, sync_name):
             path_dest = os.path.join(dest, file)
             if file not in files_destination_md5:
                 shutil.copy2(path_source, path_dest)                
-                adiciona_linha_log("Copiado: " + str(path_source) + " para " + str(path_dest))
+                adiciona_linha_log("Copiado: " + str(path_source) + " to " + str(path_dest))
             else:            
                 if files_source_md5[file] != files_destination_md5[file]:
                     shutil.copy2(path_source, path_dest)
-                    adiciona_linha_log("Sobrescrito: " + str(path_source) + " para " + str(path_dest))
+                    adiciona_linha_log("Sobrescrito: " + str(path_source) + " to " + str(path_dest))
         return 0
 
     except Exception as err:
@@ -109,32 +109,38 @@ def filetree(source, dest, sync_name):
         adiciona_linha_log(str(err)+debug)
         return 1
 
-def event_operations(filepath_source, path_dest, sync_name):
+def event_operations(filepath_source, path_dest, sync_name, event):
     try: 
         sync_ext = configs['SYNC_EXTENSIONS'][sync_name].split(", ")
     except:
         sync_ext = []
 
-    filename = getfilename(filepath_source)
-    filepath_dest = os.path.join(path_dest, filename)
-
+    
     try:
+        filename = getfilename(filepath_source)
+        filepath_dest = os.path.join(path_dest, filename)
+
+        if 'FileMovedEvent' in str(event):
+            adiciona_linha_log("Renomeado: " + str(event.src_path) + ' to ' + str(event.dest_path))
+            shutil.copy2(str(event.dest_path), (os.path.join(   path_dest, getfilename(str(event.dest_path))   )))
+            adiciona_linha_log("Copiado: " + str(event.dest_path) + " to " + (os.path.join(   path_dest, getfilename(str(event.dest_path))     )))   
+            #print(event.dest_path)
+
         if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
             if (not os.path.splitext(filename)[1][1:] in sync_ext) & (len(sync_ext) > 0):
                 return
             if not os.path.exists(filepath_source):
                 os.remove(filepath_dest)
-                adiciona_linha_log("EVENT -> Removido: " + str(filepath_dest))
+                adiciona_linha_log("Removido: " + str(filepath_dest))
             elif not os.path.exists(filepath_dest):
                 shutil.copy2(filepath_source, filepath_dest)
-                adiciona_linha_log("EVENT -> Copiado: " + str(filepath_source) + " to " + str(filepath_dest))   
+                adiciona_linha_log("Copiado: " + str(filepath_source) + " to " + str(filepath_dest))   
             else:
                 source_mtime = os.stat(filepath_source).st_mtime
                 dest_mtime = os.stat(filepath_dest).st_mtime
                 if source_mtime != dest_mtime:
                     shutil.copy2(filepath_source, filepath_dest)
-                    adiciona_linha_log("EVENT -> Sobrescrito: " + str(filepath_source) + " to " + str(filepath_dest))
-        
+                    adiciona_linha_log("Sobrescrito: " + str(filepath_source) + " to " + str(filepath_dest))
 
     except Exception as Err:
         adiciona_linha_log(str(Err)) 
@@ -161,11 +167,10 @@ class Event(LoggingEventHandler):
             LoggingEventHandler()
             adiciona_linha_log(str(event))
             path_event = str(event.src_path)
-            for item in configs['SYNC_FOLDERS']:
-                paths = (configs['SYNC_FOLDERS'][item]).split(', ')
+            for sync in configs['SYNC_FOLDERS']:
+                paths = (configs['SYNC_FOLDERS'][sync]).split(', ')
                 if paths[0] in path_event:
-                    #error = filetree(paths[0], paths[1], item)
-                    event_operations(path_event, paths[1], item)
+                    event_operations(path_event, paths[1], sync, event)
             
     except Exception as err:
         send_status_metric(1)  
@@ -200,4 +205,5 @@ if __name__ == "__main__":
           
     except KeyboardInterrupt:
         observer.stop()
+        send_status_metric("STOPPED")
     observer.join()
