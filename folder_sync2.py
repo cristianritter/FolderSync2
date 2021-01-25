@@ -9,11 +9,13 @@ from datetime import date, datetime
 from pyzabbix import ZabbixMetric, ZabbixSender
 from threading import Thread
 
+print('Carregando configurações...')
 configuration = parse_config.ConfPacket()
 configs = configuration.load_config('SYNC_FOLDERS, LOG_FOLDER, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX')
 
 metric_value = 0
 
+print("Definindo classes...")
 class Waiter(Thread):
     def run(self):
         while 1:
@@ -21,6 +23,23 @@ class Waiter(Thread):
             global metric_value
             send_status_metric(metric_value)
 
+class Event(LoggingEventHandler):
+    try:
+        def dispatch(self, event): 
+            LoggingEventHandler()
+            adiciona_linha_log(str(event))
+            path_event = str(event.src_path)
+            for sync in configs['SYNC_FOLDERS']:
+                paths = (configs['SYNC_FOLDERS'][sync]).split(', ')
+                if paths[0] in path_event:
+                    event_operations(path_event, paths[1], sync, event)
+            
+    except Exception as err:
+        send_status_metric(1)  
+        adiciona_linha_log("Logging event handler erro - "+str(err))
+
+
+print('Definindo funções...')
 def send_status_metric(value):
     try:
         packet = [
@@ -45,7 +64,7 @@ def adiciona_linha_log(texto):
 def getfilename(filepath):
     try:
         pathlist = filepath.split('\\')
-        filename = (pathlist[len(pathlist)-1])
+        filename = (pathlist[len(pathlist)-1]).lower()
         return (filename)
     except Exception as Err:
         adiciona_linha_log(str(Err)+'Getfilename')
@@ -54,27 +73,25 @@ def filetree(source, dest, sync_name):
     files_destination_md5=dict()
     files_source_md5=dict()
     try: 
-        sync_ext = configs['SYNC_EXTENSIONS'][sync_name].split(", ")
+        sync_ext = configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
+        print(sync_ext)
     except:
         sync_ext = []
 
-    #files_destination_md5.clear()
-    #files_source_md5.clear()
-    
     try:
         debug = 'scan dest'
         for e in os.scandir(dest):
             if e.is_file():
-                if (not os.path.splitext(e.name)[1][1:] in sync_ext) & (len(sync_ext) > 0):
+                if (not os.path.splitext(e.name)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
                     continue
-                files_destination_md5[e.name]=e.stat().st_mtime
+                files_destination_md5[e.name.lower()]=e.stat().st_mtime
               
         debug = 'scan source'
         for e in os.scandir(source):
             if e.is_file():
-                if (not os.path.splitext(e.name)[1][1:] in sync_ext) & (len(sync_ext) > 0):
+                if (not os.path.splitext(e.name)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
                     continue
-                files_source_md5[e.name]=e.stat().st_mtime
+                files_source_md5[e.name.lower()]=e.stat().st_mtime
             
         files_to_remove=[]
 
@@ -111,23 +128,21 @@ def filetree(source, dest, sync_name):
 
 def event_operations(filepath_source, path_dest, sync_name, event):
     try: 
-        sync_ext = configs['SYNC_EXTENSIONS'][sync_name].split(", ")
+        sync_ext = configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
     except:
         sync_ext = []
 
-    
     try:
-        filename = getfilename(filepath_source)
+        filename = getfilename(filepath_source).lower()
         filepath_dest = os.path.join(path_dest, filename)
 
         if 'FileMovedEvent' in str(event):
             adiciona_linha_log("Renomeado: " + str(event.src_path) + ' to ' + str(event.dest_path))
             shutil.copy2(str(event.dest_path), (os.path.join(   path_dest, getfilename(str(event.dest_path))   )))
             adiciona_linha_log("Copiado: " + str(event.dest_path) + " to " + (os.path.join(   path_dest, getfilename(str(event.dest_path))     )))   
-            #print(event.dest_path)
-
+       
         if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
-            if (not os.path.splitext(filename)[1][1:] in sync_ext) & (len(sync_ext) > 0):
+            if (not os.path.splitext(filename)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
                 return
             if not os.path.exists(filepath_source):
                 os.remove(filepath_dest)
@@ -161,22 +176,9 @@ def sync_all_folders():
     except Exception as err:
         adiciona_linha_log("Falha durante execução da função sync_all_folders - "+str(err))
 
-class Event(LoggingEventHandler):
-    try:
-        def dispatch(self, event): 
-            LoggingEventHandler()
-            adiciona_linha_log(str(event))
-            path_event = str(event.src_path)
-            for sync in configs['SYNC_FOLDERS']:
-                paths = (configs['SYNC_FOLDERS'][sync]).split(', ')
-                if paths[0] in path_event:
-                    event_operations(path_event, paths[1], sync, event)
-            
-    except Exception as err:
-        send_status_metric(1)  
-        adiciona_linha_log("Logging event handler erro - "+str(err))
 
 if __name__ == "__main__":
+    print("Inicializando sistema de logging..")
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
