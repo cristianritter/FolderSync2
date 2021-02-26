@@ -8,6 +8,14 @@ from watchdog.events import LoggingEventHandler
 from datetime import date, datetime
 from pyzabbix import ZabbixMetric, ZabbixSender
 from threading import Thread
+import PySimpleGUI as sg
+import wx.adv
+import wx
+
+TRAY_TOOLTIP = 'FolderSync' 
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+TRAY_ICON = 'icon.png' 
+diretorio = os.path.join(ROOT_DIR, TRAY_ICON)
 
 print('Carregando configurações...')
 configuration = parse_config.ConfPacket()
@@ -38,9 +46,76 @@ class Event(LoggingEventHandler):
         send_status_metric(1)  
         adiciona_linha_log("Logging event handler erro - "+str(err))
 
+class LogWindow:
+    def __init__(self, codigo, size, scale=1.0, theme='LightBlue'):
+        self.theme = theme  
+        self.default_bg_color = sg.LOOK_AND_FEEL_TABLE[self.theme]['BACKGROUND']
+        self.window_size = size  
+        self.codigo = codigo
+        self.window = self.create_window()
+            
+    def create_window(self):
+        """ Create GUI instance """
+        sg.change_look_and_feel(self.theme)
+        main_layout = [
+            [sg.Text('FolderSync', font='Fixedsys 22 ', text_color='Black', tooltip="By EngNSC®")],
+            [sg.Text('Últimos eventos: ', text_color='gray')],
+            [sg.Multiline(self.codigo, size=(120,20), font='Courier 12', text_color='white', background_color='black', key='LOG' )],
+            [sg.Text("Clique aqui para consultar todos os logs", font='Courier 12 underline', text_color='gray', key='FOLDER', enable_events=True)],
+        ] 
+        window = sg.Window('FolderSync - Sincronizador de diretórios', main_layout, element_justification='center', finalize=True)
+        return window
+
+def create_menu_item(menu, label, func):
+    item = wx.MenuItem(menu, -1, label)
+    menu.Bind(wx.EVT_MENU, func, id=item.GetId())
+    menu.Append(item)
+    return item
+
+class TaskBarIcon(wx.adv.TaskBarIcon):
+    def __init__(self, frame):
+        self.frame = frame
+        super(TaskBarIcon, self).__init__()
+        self.set_icon(diretorio)
+        self.Bind(wx.adv.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
+
+    def CreatePopupMenu(self):
+        menu = wx.Menu()
+        create_menu_item(menu, 'Site', self.on_hello)
+        menu.AppendSeparator()
+        create_menu_item(menu, 'Exit', self.on_exit)
+        return menu
+
+    def set_icon(self, path):
+        icon = wx.Icon(path)
+        self.SetIcon(icon, TRAY_TOOLTIP)
+
+    def on_left_down(self, event):      
+        print ('Tray icon was left-clicked.')
+
+    def on_hello(self, event):
+        print ('Hello, world!')
+
+    def on_exit(self, event):
+        wx.CallAfter(self.Destroy)
+        self.frame.Close()
+
+class App(wx.App):
+    def OnInit(self):
+        frame=wx.Frame(None)
+        self.SetTopWindow(frame)
+        TaskBarIcon(frame)
+        return True
 
 print('Definindo funções...')
+
 def send_status_metric(value):
+    '''
+    Envia metricas para zabbix:
+        ---Em caso de erro de sinc -> envia str com caminho do diretório que ocorreu o erro [strlen > 1]
+        ---Em caso de sucesso nas rotinas -> envia flag str com '0' [strlen == 1]
+        ---Após sincronizar todas as pastas da lista envia flag str com '1' [strlen == 1]
+    '''
     try:
         packet = [
             ZabbixMetric(configs['ZABBIX']['hostname'], configs['ZABBIX']['key'], value)
@@ -127,6 +202,7 @@ def filetree(source, dest, sync_name):
         return 1
 
 def event_operations(filepath_source, path_dest, sync_name, event):
+    update_logs()
     try: 
         sync_ext = configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
     except:
@@ -172,10 +248,36 @@ def sync_all_folders():
         if error_counter == 0:
             global metric_value
             metric_value = 0
+        send_status_metric(1)
 
     except Exception as err:
         adiciona_linha_log("Falha durante execução da função sync_all_folders - "+str(err))
 
+def window_thread():
+    while 1:
+        event, _ = lg.window.read(timeout=300)
+        if event == None: #se fechar a janela
+            break
+        if event == 'FOLDER':
+            os.startfile(configs['LOG_FOLDER']['log_folder'])
+
+def update_logs():
+    mes_ano = datetime.now().strftime('_%Y%m')
+    log_file = configs['LOG_FOLDER']['log_folder']+'log'+mes_ano+'.txt'
+    f = open(log_file, "r")
+    linhas = f.readlines(5000)
+    linhas.reverse()
+    lg.window['LOG'].update('\n'.join(linhas) )
+
+def syncs_thread():
+    while True:
+        update_logs()
+        sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])
+        if (sleep_time > 0):
+            time.sleep(sleep_time)
+            sync_all_folders()
+        else:
+            time.sleep(30)
 
 if __name__ == "__main__":
     print("Inicializando sistema de logging..")
@@ -195,17 +297,22 @@ if __name__ == "__main__":
             adiciona_linha_log(str(err)+host[0])
 
     observer.start()
-
+    lg = LogWindow(3, size=(500, 500), scale=0.5)
+    
+    app = App(False)
+    
     try:
-        while True:
-            sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])
-            if (sleep_time > 0):
-                time.sleep(sleep_time)
-                sync_all_folders()
-            else:
-                time.sleep(30)
+    
+        t = Thread(target=syncs_thread)
+        t.start()
           
     except KeyboardInterrupt:
         observer.stop()
         send_status_metric("STOPPED")
+    window_thread() #nao pode ser um thread separado
+    
     observer.join()
+
+   
+
+
