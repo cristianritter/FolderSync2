@@ -241,6 +241,7 @@ try:
             if error_counter == 0:
                 global metric_value
                 metric_value = 0
+            update_logs()
 
         except Exception as err:
             adiciona_linha_log("Falha durante execução da função sync_all_folders - "+str(err))
