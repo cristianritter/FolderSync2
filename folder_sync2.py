@@ -143,7 +143,7 @@ try:
         files_source_md5=dict()
         try: 
             sync_ext = configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
-            print(sync_ext)
+            #print(sync_ext)
         except:
             sync_ext = []
 
@@ -208,7 +208,7 @@ try:
             if 'FileMovedEvent' in str(event):
                 adiciona_linha_log("Renomeado: " + str(event.src_path) + ' to ' + str(event.dest_path))
                 shutil.copy2(str(event.dest_path), (os.path.join(   path_dest, getfilename(str(event.dest_path))   )))
-                adiciona_linha_log("Copiado: " + str(event.dest_path) + " to " + (os.path.join(   path_dest, getfilename(str(event.dest_path))     )))   
+                adiciona_linha_log("Copiado: " + str(event.dest_path) + "[" + str(os.path.getsize(str(event.dest_path))) + "]" + " to " + (   os.path.join(path_dest, getfilename(str(event.dest_path)))    ) + "[" + str(os.path.getsize(os.path.join(path_dest, getfilename(str(event.dest_path))))) + "]")   
         
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
                 if (not os.path.splitext(filename)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
@@ -218,13 +218,13 @@ try:
                     adiciona_linha_log("Removido: " + str(filepath_dest))
                 elif not os.path.exists(filepath_dest):
                     shutil.copy2(filepath_source, filepath_dest)
-                    adiciona_linha_log("Copiado: " + str(filepath_source) + " to " + str(filepath_dest))   
+                    adiciona_linha_log("Copiado: " + str(filepath_source) + "[" + str(os.path.getsize( str(filepath_source) )) + "]" + " to " + str(filepath_dest) + "[" + str(os.path.getsize( str(filepath_dest) )) + "]")  
                 else:
                     source_mtime = os.stat(filepath_source).st_mtime
                     dest_mtime = os.stat(filepath_dest).st_mtime
                     if source_mtime != dest_mtime:
                         shutil.copy2(filepath_source, filepath_dest)
-                        adiciona_linha_log("Sobrescrito: " + str(filepath_source) + " to " + str(filepath_dest))
+                        adiciona_linha_log("Sobrescrito: " + str(filepath_source) + "[" + str(os.path.getsize( str(filepath_source) )) + "]" + " to " + str(filepath_dest) + "[" + str(os.path.getsize( str(filepath_dest) )) + "]")
 
         except Exception as Err:
             adiciona_linha_log(str(Err)) 
