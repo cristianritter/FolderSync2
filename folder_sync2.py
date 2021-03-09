@@ -182,11 +182,14 @@ try:
                 path_dest = os.path.join(dest, file)
                 if file not in files_destination_md5:
                     shutil.copy2(path_source, path_dest)                
-                    adiciona_linha_log("Copiado: " + str(path_source) + " to " + str(path_dest))
+#                    adiciona_linha_log("Copiado: " + str(path_source) + " to " + str(path_dest))
+                    adiciona_linha_log("Copiado: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize(str(path_dest) )) + "]")
                 else:            
                     if files_source_md5[file] != files_destination_md5[file]:
                         shutil.copy2(path_source, path_dest)
-                        adiciona_linha_log("Sobrescrito: " + str(path_source) + " to " + str(path_dest))
+                        #adiciona_linha_log("Sobrescrito: " + str(path_source) + " to " + str(path_dest))
+                        adiciona_linha_log("Sobrescrito: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize( str(path_dest) )) + "]")
+
             return 0
 
         except Exception as err:
