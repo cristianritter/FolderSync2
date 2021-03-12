@@ -20,6 +20,12 @@ try:
     TRAY_ICON = 'icon.png' 
     diretorio = os.path.join(ROOT_DIR, TRAY_ICON)
 
+    sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])
+    if (sleep_time > 0):
+        pass
+    else:
+        sleep_time = 30
+
     def create_menu_item(menu, label, func):
         item = wx.MenuItem(menu, -1, label)
         menu.Bind(wx.EVT_MENU, func, id=item.GetId())
@@ -63,20 +69,38 @@ try:
             my_sizer = wx.BoxSizer(wx.VERTICAL) 
             font = wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD)
             self.st2 = wx.StaticText(panel, label='Visualização de eventos')
+            self.led1 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,710))
+            self.ld1txt = wx.StaticText(panel, label='Event in curse', pos=(825, 708))
+            self.led2 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,725))
+            self.ld2txt = wx.StaticText(panel, label='All Sync in curse', pos=(825, 723))
+            self.led3 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,740))
+            self.ld3txt = wx.StaticText(panel, label='Error detected', pos=(825, 738))
+            self.led1.SetBackgroundColour('gray')
+            self.led2.SetBackgroundColour('gray')
+            self.led3.SetBackgroundColour('gray')
+            
             self.st2.SetFont(font)
             self.st1 = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50,650))
             my_sizer.Add(self.st2, 0, wx.ALL | wx.CENTER, 10) 
             my_sizer.Add(self.st1, 0, wx.ALL | wx.EXPAND, 10) 
             my_btn = wx.Button(panel, label='Ocultar')
+            clean_btn = wx.StaticText(panel, label='Limpar', pos=(825,750))
+            font = wx.Font(7, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.BOLD, underline=True)
+            clean_btn.SetFont(font)
             my_btn.Bind(wx.EVT_BUTTON, self.on_press)
-            my_sizer.Add(my_btn, 0, wx.ALL | wx.CENTER, 5)   
+            clean_btn.Bind(wx.EVT_LEFT_DOWN, self.on_clean)
+            my_sizer.Add(my_btn, 0, wx.ALL | wx.CENTER, 5) 
             panel.SetSizer(my_sizer)
         # self.SetDimensions(0,0,640,480)
             self.Show()
 
         def on_press(self, event):
             frame.Hide()
-
+        
+        def on_clean(self, event):
+            print('limpar')
+            frame.led3.SetBackgroundColour('gray')
+            frame.Refresh()
 
     metric_value = 0
 
@@ -103,7 +127,12 @@ try:
         while 1:
             time.sleep(int(configs['ZABBIX']['send_metrics_interval']))
             global metric_value
+            global frame
             value = metric_value
+            if (value != 0):
+                frame.led3.SetBackgroundColour('red')
+                frame.Refresh()
+
             '''
             Envia metricas para zabbix:
                 ---Em caso de erro de sinc -> envia str com caminho do diretório que ocorreu o erro [strlen > 1]
@@ -117,6 +146,7 @@ try:
                 ZabbixSender(zabbix_server=configs['ZABBIX']['zabbix_server'], zabbix_port=int(configs['ZABBIX']['port'])).send(packet)
             except Exception as err:
                 adiciona_linha_log("Falha de conexão com o Zabbix - "+str(err))
+
 
     def adiciona_linha_log(texto):
         dataFormatada = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
@@ -143,7 +173,6 @@ try:
         files_source_md5=dict()
         try: 
             sync_ext = configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
-            #print(sync_ext)
         except:
             sync_ext = []
 
@@ -177,19 +206,19 @@ try:
                 files_destination_md5.pop(item)
 
             debug = 'copy files'
+            thistime=round(time.time())
             for file in files_source_md5:
                 path_source = os.path.join(source, file)
                 path_dest = os.path.join(dest, file)
                 if file not in files_destination_md5:
                     shutil.copy2(path_source, path_dest)                
-#                    adiciona_linha_log("Copiado: " + str(path_source) + " to " + str(path_dest))
                     adiciona_linha_log("Copiado: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize(str(path_dest) )) + "]")
                 else:            
                     if files_source_md5[file] != files_destination_md5[file]:
                         shutil.copy2(path_source, path_dest)
-                        #adiciona_linha_log("Sobrescrito: " + str(path_source) + " to " + str(path_dest))
                         adiciona_linha_log("Sobrescrito: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize( str(path_dest) )) + "]")
-
+                if (round(time.time()) > ( thistime + sleep_time) ):
+                    return 0   
             return 0
 
         except Exception as err:
@@ -199,6 +228,9 @@ try:
             return 1
 
     def event_operations(filepath_source, path_dest, sync_name, event):
+        global frame
+        frame.led1.SetBackgroundColour('Red')
+        frame.Refresh()
         try: 
             sync_ext = configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
         except:
@@ -220,15 +252,24 @@ try:
                     os.remove(filepath_dest)
                     adiciona_linha_log("Removido: " + str(filepath_dest))
                 elif not os.path.exists(filepath_dest):
+                    time.sleep(1)          #testar resultado p evitar acesso negado ao arquivo
                     shutil.copy2(filepath_source, filepath_dest)
                     adiciona_linha_log("Copiado: " + str(filepath_source) + "[" + str(os.path.getsize( str(filepath_source) )) + "]" + " to " + str(filepath_dest) + "[" + str(os.path.getsize( str(filepath_dest) )) + "]")  
+                    if (os.path.getsize(str(filepath_source)) != os.path.getsize(str(filepath_dest))):
+                        os.remove(filepath_dest)
+                        adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync.' + str(filepath_source))
                 else:
                     source_mtime = os.stat(filepath_source).st_mtime
                     dest_mtime = os.stat(filepath_dest).st_mtime
                     if source_mtime != dest_mtime:
+                        time.sleep(1)           #testar resultado
                         shutil.copy2(filepath_source, filepath_dest)
                         adiciona_linha_log("Sobrescrito: " + str(filepath_source) + "[" + str(os.path.getsize( str(filepath_source) )) + "]" + " to " + str(filepath_dest) + "[" + str(os.path.getsize( str(filepath_dest) )) + "]")
-
+                        if (os.path.getsize(str(filepath_source)) != os.path.getsize(str(filepath_dest))):
+                            os.remove(filepath_dest)
+                            adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync' + str(filepath_source))
+            frame.led1.SetBackgroundColour('gray')
+            frame.Refresh()
         except Exception as Err:
             adiciona_linha_log(str(Err)) 
             global metric_value
@@ -262,33 +303,30 @@ try:
     
     def syncs_thread():
         while True:
-            sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])
-            if (sleep_time > 0):
-                time.sleep(sleep_time)
-                sync_all_folders()
-            else:
-                time.sleep(30)
-
-
+            global frame
+            frame.led2.SetBackgroundColour('Red')
+            frame.Refresh()
+            sync_all_folders()
+            frame.led2.SetBackgroundColour('gray')
+            frame.Refresh()
+            time.sleep(sleep_time)
+            
     if __name__ == "__main__":
 
         print("Inicializando sistema de logging..")
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s - %(message)s',
-                            datefmt='%Y-%m-%d %H:%M:%S')
-        
+                            datefmt='%Y-%m-%d %H:%M:%S') 
         event_handler = Event()
-        observer = Observer()
-        
+        observer = Observer() 
         for item in configs['SYNC_FOLDERS']:
             try:
                 host = (configs['SYNC_FOLDERS'][item]).split(', ')
                 observer.schedule(event_handler, host[0], recursive=False)
+
             except Exception as err:
                 adiciona_linha_log(str(err)+host[0])
-
-        observer.start()
-        
+        observer.start()     
         try:      
             app = wx.App()
             frame = MyFrame()
@@ -301,9 +339,9 @@ try:
             app.MainLoop()
 
         except KeyboardInterrupt:
-            observer.stop()
-        
+            observer.stop()   
         #observer.join()
+        
 except Exception as ERR:
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
     dire = os.path.join(ROOT_DIR, 'ERRO.TXT')

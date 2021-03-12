@@ -1,0 +1,26 @@
+StaticBox(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 2 has unexpected type 'str'StaticBox(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 2 has unexpected type 'str'name 'frame' is not definedname 'frame' is not definedname 'frame' is not defined[WinError 64] O nome da rede especificado não está mais disponível.[WinError 64] O nome da rede especificado não está mais disponível.[WinError 64] O nome da rede especificado não está mais disponível.unsupported operand type(s) for |: 'TextAttrFlags' and 'Font'Font(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 1 has unexpected type 'int'
+  overload 3: argument 1 has unexpected type 'int'
+  overload 4: argument 4 has unexpected type 'Font'
+  overload 5: argument 1 has unexpected type 'int'
+  overload 6: argument 1 has unexpected type 'int'
+  overload 7: argument 1 has unexpected type 'int'Font(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 1 has unexpected type 'int'
+  overload 3: argument 1 has unexpected type 'int'
+  overload 4: argument 4 has unexpected type 'Font'
+  overload 5: argument 1 has unexpected type 'int'
+  overload 6: argument 1 has unexpected type 'int'
+  overload 7: argument 1 has unexpected type 'int'module 'wx' has no attribute 'UNDERLINE'module 'wx' has no attribute 'UNDERLINE'C++ assertion "weight % 100 == 0" failed at ..\..\src\common\fontcmn.cpp(245) in wxFontBase::GetNumericWeightOf(): Font(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 1 has unexpected type 'int'
+  overload 3: argument 1 has unexpected type 'int'
+  overload 4: argument 3 has unexpected type 'Font'
+  overload 5: argument 1 has unexpected type 'int'
+  overload 6: argument 1 has unexpected type 'int'
+  overload 7: argument 1 has unexpected type 'int'
