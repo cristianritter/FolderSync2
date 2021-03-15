@@ -14,7 +14,8 @@ try:
     print('Carregando configurações...')
     configuration = parse_config.ConfPacket()
     configs = configuration.load_config('SYNC_FOLDERS, LOG_FOLDER, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
-
+    sincronizando = False
+    evento_acontecendo = False
     TRAY_TOOLTIP = 'FolderSync - ' + configs['SYNC_NAME']['name']
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
     TRAY_ICON = 'icon.png' 
@@ -64,27 +65,27 @@ try:
     class MyFrame(wx.Frame):    
         def __init__(self):
             title_ = 'FolderSync by EngNSC - ' + configs['SYNC_NAME']['name']
-            super().__init__(parent=None, title=title_, style=wx.CAPTION, pos=(5, 5), size=(1080, 800))        
+            super().__init__(parent=None, title=title_, style=wx.CAPTION, pos=(5, 5), size=(1080, 780))        
             panel = wx.Panel(self)
             my_sizer = wx.BoxSizer(wx.VERTICAL) 
             font = wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD)
             self.st2 = wx.StaticText(panel, label='Visualização de eventos')
-            self.led1 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,710))
-            self.ld1txt = wx.StaticText(panel, label='Event in curse', pos=(825, 708))
-            self.led2 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,725))
-            self.ld2txt = wx.StaticText(panel, label='All Sync in curse', pos=(825, 723))
-            self.led3 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,740))
-            self.ld3txt = wx.StaticText(panel, label='Error detected', pos=(825, 738))
+            self.led1 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,690))
+            self.ld1txt = wx.StaticText(panel, label='Event in curse', pos=(825, 688))
+            self.led2 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,705))
+            self.ld2txt = wx.StaticText(panel, label='All Sync in curse', pos=(825, 703))
+            self.led3 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,7), pos=(800,720))
+            self.ld3txt = wx.StaticText(panel, label='Error detected', pos=(825, 718))
             self.led1.SetBackgroundColour('gray')
             self.led2.SetBackgroundColour('gray')
             self.led3.SetBackgroundColour('gray')
             
             self.st2.SetFont(font)
-            self.st1 = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50,650))
+            self.st1 = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50,630))
             my_sizer.Add(self.st2, 0, wx.ALL | wx.CENTER, 10) 
             my_sizer.Add(self.st1, 0, wx.ALL | wx.EXPAND, 10) 
             my_btn = wx.Button(panel, label='Ocultar')
-            clean_btn = wx.StaticText(panel, label='Limpar', pos=(825,750))
+            clean_btn = wx.StaticText(panel, label='Limpar', pos=(825,730))
             font = wx.Font(7, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.BOLD, underline=True)
             clean_btn.SetFont(font)
             my_btn.Bind(wx.EVT_BUTTON, self.on_press)
@@ -116,7 +117,6 @@ try:
                     paths = (configs['SYNC_FOLDERS'][sync]).split(', ')
                     if paths[0] in path_event:
                         event_operations(path_event, paths[1], sync, event)
-                update_logs()
                 
         except Exception as err:
             adiciona_linha_log("Logging event handler erro - "+str(err))
@@ -159,6 +159,7 @@ try:
             f.close()
         except Exception as err:
             print(dataFormatada, err)
+        update_logs()
             
     def getfilename(filepath):
         try:
@@ -211,10 +212,12 @@ try:
                 path_source = os.path.join(source, file)
                 path_dest = os.path.join(dest, file)
                 if file not in files_destination_md5:
+                    aguarda_liberar_arquivo(path_source) #testar
                     shutil.copy2(path_source, path_dest)                
                     adiciona_linha_log("Copiado: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize(str(path_dest) )) + "]")
                 else:            
                     if files_source_md5[file] != files_destination_md5[file]:
+                        aguarda_liberar_arquivo(path_source) #testar
                         shutil.copy2(path_source, path_dest)
                         adiciona_linha_log("Sobrescrito: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize( str(path_dest) )) + "]")
                 if (round(time.time()) > ( thistime + sleep_time) ):
@@ -227,7 +230,29 @@ try:
             adiciona_linha_log(str(err)+debug)
             return 1
 
+    def aguarda_liberar_arquivo(filepath_source):
+        thistime2=round(time.time())
+        in_file = None
+        while in_file == None:
+            try:
+                in_file = open(filepath_source, "rb") # opening for [r]eading as [b]inary
+            except:
+                pass
+            time.sleep(0.1)
+            if (round(time.time()) > ( thistime2 + 120) ):
+                adiciona_linha_log("Arquivo protegido contra gravacao por mais de 120 segundos, não permitindo a cópia.")
+                break
+        try:
+            in_file.close()            
+        except:
+            pass
+
     def event_operations(filepath_source, path_dest, sync_name, event):
+        global evento_acontecendo
+        evento_acontecendo = True     
+        global sincronizando
+        while sincronizando == True:
+            time.sleep(0.1) 
         global frame
         frame.led1.SetBackgroundColour('Red')
         frame.Refresh()
@@ -247,25 +272,31 @@ try:
         
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
                 if (not os.path.splitext(filename)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
-                    return
+                    frame.led1.SetBackgroundColour('gray')
+                    frame.Refresh()
+                    return   
                 if not os.path.exists(filepath_source):
                     os.remove(filepath_dest)
                     adiciona_linha_log("Removido: " + str(filepath_dest))
                 elif not os.path.exists(filepath_dest):
-                    time.sleep(1)          #testar resultado p evitar acesso negado ao arquivo
+                    aguarda_liberar_arquivo(filepath_source)
                     shutil.copy2(filepath_source, filepath_dest)
-                    adiciona_linha_log("Copiado: " + str(filepath_source) + "[" + str(os.path.getsize( str(filepath_source) )) + "]" + " to " + str(filepath_dest) + "[" + str(os.path.getsize( str(filepath_dest) )) + "]")  
-                    if (os.path.getsize(str(filepath_source)) != os.path.getsize(str(filepath_dest))):
+                    origem_size = os.path.getsize( str(filepath_source) )
+                    destino_size = os.path.getsize( str(filepath_dest) )
+                    adiciona_linha_log("Copiado: " + str(filepath_source) + "[" + str(origem_size) + "]" + " to " + str(filepath_dest) + "[" + str(destino_size) + "]")  
+                    if (origem_size != destino_size):
                         os.remove(filepath_dest)
                         adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync.' + str(filepath_source))
                 else:
                     source_mtime = os.stat(filepath_source).st_mtime
                     dest_mtime = os.stat(filepath_dest).st_mtime
                     if source_mtime != dest_mtime:
-                        time.sleep(1)           #testar resultado
+                        aguarda_liberar_arquivo(filepath_source)
                         shutil.copy2(filepath_source, filepath_dest)
-                        adiciona_linha_log("Sobrescrito: " + str(filepath_source) + "[" + str(os.path.getsize( str(filepath_source) )) + "]" + " to " + str(filepath_dest) + "[" + str(os.path.getsize( str(filepath_dest) )) + "]")
-                        if (os.path.getsize(str(filepath_source)) != os.path.getsize(str(filepath_dest))):
+                        origem_size = os.path.getsize( str(filepath_source) )
+                        destino_size = os.path.getsize( str(filepath_dest) )
+                        adiciona_linha_log("Sobrescrito: " + str(filepath_source) + "[" + str(origem_size) + "]" + " to " + str(filepath_dest) + "[" + str(destino_size) + "]")
+                        if (origem_size != destino_size):
                             os.remove(filepath_dest)
                             adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync' + str(filepath_source))
             frame.led1.SetBackgroundColour('gray')
@@ -274,6 +305,7 @@ try:
             adiciona_linha_log(str(Err)) 
             global metric_value
             metric_value = str(filepath_source)
+        evento_acontecendo = False
 
     def sync_all_folders():
         try:
@@ -285,7 +317,6 @@ try:
             if error_counter == 0:
                 global metric_value
                 metric_value = 0
-            update_logs()
 
         except Exception as err:
             adiciona_linha_log("Falha durante execução da função sync_all_folders - "+str(err))
@@ -303,10 +334,16 @@ try:
     
     def syncs_thread():
         while True:
+            global sincronizando
+            sincronizando = True
+            global evento_acontecendo
+            while evento_acontecendo == True:
+                time.sleep(0.1)
             global frame
             frame.led2.SetBackgroundColour('Red')
             frame.Refresh()
             sync_all_folders()
+            sincronizando = False
             frame.led2.SetBackgroundColour('gray')
             frame.Refresh()
             time.sleep(sleep_time)
