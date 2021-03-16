@@ -122,9 +122,13 @@ try:
             frame.Hide()
         
         def on_clean(self, event):
-            print('limpar')
             frame.led3.SetBackgroundColour('gray')
             frame.Refresh()
+
+        def set_error_led(self):
+            frame.led3.SetBackgroundColour('Red')
+            frame.Refresh()
+
 
     metric_value = 0
 
@@ -153,8 +157,7 @@ try:
             global frame
             value = metric_value
             if (value != 0):
-                frame.led3.SetBackgroundColour('red')
-                frame.Refresh()
+                frame.set_error_led()
 
             '''
             Envia metricas para zabbix:
@@ -182,6 +185,8 @@ try:
             f.close()
         except Exception as err:
             print(dataFormatada, err)
+            global frame
+            frame.set_error_led()
         update_logs()
             
     def getfilename(filepath):
@@ -191,6 +196,9 @@ try:
             return (filename)
         except Exception as Err:
             adiciona_linha_log(str(Err)+'Getfilename')
+            global frame
+            frame.set_error_led()
+
 
     def filetree(source, dest, sync_name):
         files_destination_md5=dict()
@@ -221,6 +229,7 @@ try:
             for file in files_destination_md5:
                 path_dest = os.path.join(dest, file)
                 if file not in files_source_md5:
+                    aguarda_liberar_arquivo(path_dest) #testar    
                     os.remove(path_dest)
                     adiciona_linha_log("Removido: " + str(path_dest))
                     files_to_remove.append(file)
@@ -271,12 +280,14 @@ try:
             pass
 
     def event_operations(filepath_source, path_dest, sync_name, event):
+        global frame
         global evento_acontecendo
         evento_acontecendo = True     
         global sincronizando
         while sincronizando == True:
+            frame.led1.SetBackgroundColour('Orange')
+            frame.Refresh()
             time.sleep(0.1) 
-        global frame
         frame.led1.SetBackgroundColour('Red')
         frame.Refresh()
         try: 
@@ -287,20 +298,26 @@ try:
         try:
             filename = getfilename(filepath_source).lower()
             filepath_dest = os.path.join(path_dest, filename)
-
             if 'FileMovedEvent' in str(event):
                 adiciona_linha_log("Renomeado: " + str(event.src_path) + ' to ' + str(event.dest_path))
+                aguarda_liberar_arquivo(filepath_source)
                 shutil.copy2(str(event.dest_path), (os.path.join(   path_dest, getfilename(str(event.dest_path))   )))
                 adiciona_linha_log("Copiado: " + str(event.dest_path) + "[" + str(os.path.getsize(str(event.dest_path))) + "]" + " to " + (   os.path.join(path_dest, getfilename(str(event.dest_path)))    ) + "[" + str(os.path.getsize(os.path.join(path_dest, getfilename(str(event.dest_path))))) + "]")   
-        
+            
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
                 if (not os.path.splitext(filename)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
                     frame.led1.SetBackgroundColour('gray')
                     frame.Refresh()
+                    evento_acontecendo = False
                     return   
                 if not os.path.exists(filepath_source):
-                    os.remove(filepath_dest)
-                    adiciona_linha_log("Removido: " + str(filepath_dest))
+                    try:
+                        os.remove(filepath_dest)
+                        adiciona_linha_log("Removido: " + str(filepath_dest))
+                    except Exception as err:
+                        adiciona_linha_log(str(err) + "Erro ao remover arquivo. " + str(filepath_dest))
+                        frame.set_error_led()
+                    
                 elif not os.path.exists(filepath_dest):
                     aguarda_liberar_arquivo(filepath_source)
                     shutil.copy2(filepath_source, filepath_dest)
@@ -314,7 +331,6 @@ try:
                     source_mtime = os.stat(filepath_source).st_mtime
                     dest_mtime = os.stat(filepath_dest).st_mtime
                     if source_mtime != dest_mtime:
-                        aguarda_liberar_arquivo(filepath_source)
                         shutil.copy2(filepath_source, filepath_dest)
                         origem_size = os.path.getsize( str(filepath_source) )
                         destino_size = os.path.getsize( str(filepath_dest) )
@@ -334,15 +350,19 @@ try:
         try:
             error_counter = 0
             for item in configs['SYNC_FOLDERS']:
+                time.sleep(0.1)
                 path = (configs['SYNC_FOLDERS'][item]).split(', ')
                 error_counter += filetree(path[0], path[1], item)
-                time.sleep(0.2)
+                time.sleep(0.1)
             if error_counter == 0:
                 global metric_value
                 metric_value = 0
 
         except Exception as err:
             adiciona_linha_log("Falha durante execução da função sync_all_folders - "+str(err))
+            global frame
+            frame.set_error_led()
+
 
     def update_logs():
         global frame
@@ -357,12 +377,16 @@ try:
     
     def syncs_thread():
         while True:
+            global frame
+            frame.led2.SetBackgroundColour('yellow')
+            frame.Refresh()
             global sincronizando
             sincronizando = True
             global evento_acontecendo
-            while evento_acontecendo == True:
-                time.sleep(0.1)
-            global frame
+            if evento_acontecendo == True:
+                sincronizando = False
+                time.sleep(1)
+                continue
             frame.led2.SetBackgroundColour('Red')
             frame.Refresh()
             sync_all_folders()
@@ -386,7 +410,11 @@ try:
 
             except Exception as err:
                 adiciona_linha_log(str(err)+host[0])
-        observer.start()     
+                global frame
+                frame.set_error_led()
+
+        observer.start() 
+        print('Iniciando janela wx...')    
         try:      
             app = wx.App()
             frame = MyFrame()
@@ -399,8 +427,11 @@ try:
             update_logs()
             app.MainLoop()
 
-        except KeyboardInterrupt:
-            observer.stop()   
+        except Exception as Err:
+            adiciona_linha_log(str(Err))
+            #observer.stop()   
+            frame.set_error_led()
+
         #observer.join()
         
 except Exception as ERR:
