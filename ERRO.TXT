@@ -23,4 +23,36 @@ StaticBox(): arguments did not match any overloaded call:
   overload 4: argument 3 has unexpected type 'Font'
   overload 5: argument 1 has unexpected type 'int'
   overload 6: argument 1 has unexpected type 'int'
-  overload 7: argument 1 has unexpected type 'int'
+  overload 7: argument 1 has unexpected type 'int'module 'wx' has no attribute 'IconFromLocation''MyFrame' object has no attribute 'st1''MyFrame' object has no attribute 'st1''MyFrame' object has no attribute 'st1'Font(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 1 has unexpected type 'int'
+  overload 3: argument 1 has unexpected type 'int'
+  overload 4: 'underline' is not a valid keyword argument
+  overload 5: argument 1 has unexpected type 'int'
+  overload 6: argument 1 has unexpected type 'int'
+  overload 7: argument 1 has unexpected type 'int'Font(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 1 has unexpected type 'int'
+  overload 3: argument 1 has unexpected type 'int'
+  overload 4: 'underline' is not a valid keyword argument
+  overload 5: argument 1 has unexpected type 'int'
+  overload 6: argument 1 has unexpected type 'int'
+  overload 7: argument 1 has unexpected type 'int'Font(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 1 has unexpected type 'int'
+  overload 3: argument 1 has unexpected type 'int'
+  overload 4: argument 4 has unexpected type 'Font'
+  overload 5: argument 1 has unexpected type 'int'
+  overload 6: argument 1 has unexpected type 'int'
+  overload 7: argument 1 has unexpected type 'int''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx'C++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizers'MyFrame' object has no attribute 'ld1tx'C++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersC++ assertion "!(flags & wxALIGN_RIGHT)" failed at ..\..\src\common\sizer.cpp(2168) in wxBoxSizer::DoInsert(): Horizontal alignment flags are ignored in horizontal sizersmodule 'wx' has no attribute 'ALIGNCENTER'module 'wx' has no attribute 'ALIGNCENTER'module 'wx' has no attribute 'ALIGNCENTER'module 'wx' has no attribute 'ALIG''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx''MyFrame' object has no attribute 'ld1tx'C++ assertion ""!m_containingSizer"" failed at ..\..\src\common\wincmn.cpp(2471) in wxWindowBase::SetContainingSizer(): Adding a window already in a sizer, detach it first!StaticText(): arguments did not match any overloaded call:
+  overload 1: too many arguments
+  overload 2: argument 3 has unexpected type 'int''MyFrame' object has no attribute 'clear_btn''MyFrame' object has no attribute 'clear_btn'Sizer.Add(): arguments did not match any overloaded call:
+  overload 1: argument 1 has unexpected type 'BoxSizer'
+  overload 2: argument 1 has unexpected type 'BoxSizer'
+  overload 3: argument 2 has unexpected type 'int'
+  overload 4: 'size' is not a valid keyword argument
+  overload 5: argument 1 has unexpected type 'BoxSizer'
+  overload 6: argument 1 has unexpected type 'BoxSizer'
+  overload 7: argument 1 has unexpected type 'BoxSizer'
+  overload 8: argument 1 has unexpected type 'BoxSizer'
+  overload 9: argument 1 has unexpected type 'BoxSizer''MyFrame' object has no attribute 'linha_titulo''MyFrame' object has no attribute 'linha_titulo'name 'linha_led' is not definedname 'linha_led' is not definedname 'linha_led' is not definedname 'linha_led' is not defined'MyFrame' object has no attribute 'title_txt'name 'linha_led' is not definedname 'linha_led' is not definedname 'linha_led' is not defined'MyFrame' object has no attribute 'title_txt'C++ assertion ""!m_containingSizer"" failed at ..\..\src\common\wincmn.cpp(2471) in wxWindowBase::SetContainingSizer(): Adding a window already in a sizer, detach it first!C++ assertion ""!m_containingSizer"" failed at ..\..\src\common\wincmn.cpp(2471) in wxWindowBase::SetContainingSizer(): Adding a window already in a sizer, detach it first!C++ assertion ""!m_containingSizer"" failed at ..\..\src\common\wincmn.cpp(2471) in wxWindowBase::SetContainingSizer(): Adding a window already in a sizer, detach it first!
