@@ -263,6 +263,7 @@ try:
             return 1
 
     def aguarda_liberar_arquivo(filepath_source):
+        time.sleep(0.1)
         thistime2=round(time.time())
         in_file = None
         while in_file == None:
@@ -270,7 +271,7 @@ try:
                 in_file = open(filepath_source, "rb") # opening for [r]eading as [b]inary
             except:
                 pass
-            time.sleep(0.1)
+            time.sleep(0.02)
             if (round(time.time()) > ( thistime2 + 120) ):
                 adiciona_linha_log("Arquivo protegido contra gravacao por mais de 120 segundos, não permitindo a cópia.")
                 break
@@ -285,7 +286,7 @@ try:
         evento_acontecendo = True     
         global sincronizando
         while sincronizando == True:
-            frame.led1.SetBackgroundColour('Orange')
+            frame.led1.SetBackgroundColour('Yellow')
             frame.Refresh()
             time.sleep(0.1) 
         frame.led1.SetBackgroundColour('Red')
@@ -294,50 +295,42 @@ try:
             sync_ext = configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
         except:
             sync_ext = []
-
         try:
             filename = getfilename(filepath_source).lower()
             filepath_dest = os.path.join(path_dest, filename)
-            if 'FileMovedEvent' in str(event):
-                adiciona_linha_log("Renomeado: " + str(event.src_path) + ' to ' + str(event.dest_path))
-                aguarda_liberar_arquivo(filepath_source)
-                shutil.copy2(str(event.dest_path), (os.path.join(   path_dest, getfilename(str(event.dest_path))   )))
-                adiciona_linha_log("Copiado: " + str(event.dest_path) + "[" + str(os.path.getsize(str(event.dest_path))) + "]" + " to " + (   os.path.join(path_dest, getfilename(str(event.dest_path)))    ) + "[" + str(os.path.getsize(os.path.join(path_dest, getfilename(str(event.dest_path))))) + "]")   
-            
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
-                if (not os.path.splitext(filename)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
-                    frame.led1.SetBackgroundColour('gray')
-                    frame.Refresh()
-                    evento_acontecendo = False
-                    return   
-                if not os.path.exists(filepath_source):
-                    try:
-                        os.remove(filepath_dest)
-                        adiciona_linha_log("Removido: " + str(filepath_dest))
-                    except Exception as err:
-                        adiciona_linha_log(str(err) + "Erro ao remover arquivo. " + str(filepath_dest))
-                        frame.set_error_led()
-                    
-                elif not os.path.exists(filepath_dest):
-                    aguarda_liberar_arquivo(filepath_source)
-                    shutil.copy2(filepath_source, filepath_dest)
-                    origem_size = os.path.getsize( str(filepath_source) )
-                    destino_size = os.path.getsize( str(filepath_dest) )
-                    adiciona_linha_log("Copiado: " + str(filepath_source) + "[" + str(origem_size) + "]" + " to " + str(filepath_dest) + "[" + str(destino_size) + "]")  
-                    if (origem_size != destino_size):
-                        os.remove(filepath_dest)
-                        adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync.' + str(filepath_source))
-                else:
-                    source_mtime = os.stat(filepath_source).st_mtime
-                    dest_mtime = os.stat(filepath_dest).st_mtime
-                    if source_mtime != dest_mtime:
+                if (os.path.splitext(filename)[1][1:].lower() in sync_ext) or (len(sync_ext) == 0):    
+                    if not os.path.exists(filepath_source):
+                        try:
+                            os.remove(filepath_dest)
+                            adiciona_linha_log("Removido: " + str(filepath_dest))
+                        except Exception as err:
+                            adiciona_linha_log(str(err) + "Erro ao remover arquivo. " + str(filepath_dest))
+                            frame.set_error_led()       
+                    elif not os.path.exists(filepath_dest):
+                        aguarda_liberar_arquivo(filepath_source)
                         shutil.copy2(filepath_source, filepath_dest)
                         origem_size = os.path.getsize( str(filepath_source) )
                         destino_size = os.path.getsize( str(filepath_dest) )
-                        adiciona_linha_log("Sobrescrito: " + str(filepath_source) + "[" + str(origem_size) + "]" + " to " + str(filepath_dest) + "[" + str(destino_size) + "]")
+                        adiciona_linha_log("Copiado: " + str(filepath_source) + "[" + str(origem_size) + "]" + " to " + str(filepath_dest) + "[" + str(destino_size) + "]")  
                         if (origem_size != destino_size):
                             os.remove(filepath_dest)
-                            adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync' + str(filepath_source))
+                            adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync.' + str(filepath_source))
+                            frame.set_error_led()
+                    else:
+                        source_mtime = os.stat(filepath_source).st_mtime
+                        dest_mtime = os.stat(filepath_dest).st_mtime
+                        if source_mtime != dest_mtime:
+                            aguarda_liberar_arquivo(filepath_source)
+                            shutil.copy2(filepath_source, filepath_dest)
+                            origem_size = os.path.getsize( str(filepath_source) )
+                            destino_size = os.path.getsize( str(filepath_dest) )
+                            adiciona_linha_log("Sobrescrito: " + str(filepath_source) + "[" + str(origem_size) + "]" + " to " + str(filepath_dest) + "[" + str(destino_size) + "]")
+                            if (origem_size != destino_size):
+                                os.remove(filepath_dest)
+                                adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync' + str(filepath_source)) 
+                                frame.set_error_led()
+
             frame.led1.SetBackgroundColour('gray')
             frame.Refresh()
         except Exception as Err:
@@ -357,12 +350,10 @@ try:
             if error_counter == 0:
                 global metric_value
                 metric_value = 0
-
         except Exception as err:
             adiciona_linha_log("Falha durante execução da função sync_all_folders - "+str(err))
             global frame
             frame.set_error_led()
-
 
     def update_logs():
         global frame
