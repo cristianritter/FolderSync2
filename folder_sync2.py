@@ -92,11 +92,16 @@ try:
             self.clear_btn.Bind(wx.EVT_LEFT_DOWN, self.on_clean)
             font = wx.Font(7, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.BOLD, underline=True)
             self.clear_btn.SetFont(font)
-            
+            self.cb1 = wx.CheckBox(panel, label='Events View')
+            self.cb1.SetValue(True)
+            self.cb1.Bind(wx.EVT_CHECKBOX, self.check_events, self.cb1)
+
             self.logpanel = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50,400))
             coluna.Add(linha_titulo, 0, wx.CENTER)
             coluna.AddSpacer(10)
             coluna.Add(self.logpanel, 0, wx.ALL | wx.EXPAND, 2) 
+            linha_filter = wx.BoxSizer(wx.HORIZONTAL)
+            linha_filter.Add(self.cb1, 0, wx.TOP, 5)
             linha_led = wx.BoxSizer(wx.HORIZONTAL)
             linha_led.Add(self.led1, 0, wx.TOP, 5)
             linha_led.AddSpacer(10)
@@ -113,11 +118,15 @@ try:
             linha_led.Add(self.clear_btn, 0, wx.TOP, 10)
             hide_button = wx.Button(panel, label='Fechar')
             hide_button.Bind(wx.EVT_BUTTON, self.on_press)            
+            coluna.Add(linha_filter, 0, wx.CENTER) 
             coluna.Add(linha_led, 0, wx.CENTER) 
             coluna.Add(hide_button, 0, wx.TOP | wx.CENTER, 30)
             panel.SetSizer(coluna)
             self.Show()
 
+        def check_events(self, event):
+            update_logs()
+           
         def on_press(self, event):
             frame.Hide()
         
@@ -229,7 +238,7 @@ try:
             for file in files_destination_md5:
                 path_dest = os.path.join(dest, file)
                 if file not in files_source_md5:
-                    aguarda_liberar_arquivo(path_dest) #testar    
+                    aguarda_liberar_arquivo(path_dest) #na remocao nao verifica tamanho   
                     os.remove(path_dest)
                     adiciona_linha_log("Removido: " + str(path_dest))
                     files_to_remove.append(file)
@@ -263,15 +272,18 @@ try:
             return 1
 
     def aguarda_liberar_arquivo(filepath_source):
-        time.sleep(0.1)
         thistime2=round(time.time())
         in_file = None
-        while in_file == None:
+        source_size1 = 0
+        source_size2 = -1
+        while in_file == None or source_size1 != source_size2:
+            source_size1 = os.path.getsize( str(filepath_source) )
+            time.sleep(0.02)
+            source_size2 = os.path.getsize( str(filepath_source) )
             try:
                 in_file = open(filepath_source, "rb") # opening for [r]eading as [b]inary
             except:
                 pass
-            time.sleep(0.02)
             if (round(time.time()) > ( thistime2 + 120) ):
                 adiciona_linha_log("Arquivo protegido contra gravacao por mais de 120 segundos, não permitindo a cópia.")
                 break
@@ -364,6 +376,13 @@ try:
         f = open(log_file, "r")
         linhas = f.readlines(20000000)
         linhas.reverse()
+        remover=[]
+        if (frame.cb1.GetValue() == False):
+            for idx, item in enumerate(linhas):
+                if ('<' in item):
+                    remover.append(item)
+            for item in remover:
+                linhas.remove(item)
         frame.logpanel.SetValue(''.join(linhas))
     
     def syncs_thread():
