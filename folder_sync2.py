@@ -12,39 +12,36 @@ import wx.adv
 import wx
 try:    
     print('Carregando configurações...')
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
     configuration = parse_config.ConfPacket()
     configs = configuration.load_config('SYNC_FOLDERS, LOG_FOLDER, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
+    sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])
+    TRAY_TOOLTIP = 'FolderSync - ' + configs['SYNC_NAME']['name']
+    icon_file = os.path.join(ROOT_DIR, 'icon.png')
     sincronizando = False
     evento_acontecendo = False
-    TRAY_TOOLTIP = 'FolderSync - ' + configs['SYNC_NAME']['name']
-    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-    TRAY_ICON = 'icon.png' 
-    diretorio = os.path.join(ROOT_DIR, TRAY_ICON)
-
-    sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])
-    if (sleep_time > 0):
-        pass
-    else:
-        sleep_time = 30
-
-    def create_menu_item(menu, label, func):
-        item = wx.MenuItem(menu, -1, label)
-        menu.Bind(wx.EVT_MENU, func, id=item.GetId())
-        menu.Append(item)
-        return item
+    metric_value = 0
+    
+    print("Definindo classes...")
 
     class TaskBarIcon(wx.adv.TaskBarIcon):
         def __init__(self, frame):
             self.frame = frame
             super(TaskBarIcon, self).__init__()
-            self.set_icon(diretorio)
+            self.set_icon(icon_file)
             self.Bind(wx.adv.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
+
+        def create_menu_item(self, menu, label, func):
+                item = wx.MenuItem(menu, -1, label)
+                menu.Bind(wx.EVT_MENU, func, id=item.GetId())
+                menu.Append(item)
+                return item
 
         def CreatePopupMenu(self):
             menu = wx.Menu()
-            create_menu_item(menu, 'Abrir log', self.on_hello)
+            self.create_menu_item(menu, 'Abrir log', self.on_left_down)
             menu.AppendSeparator()
-            create_menu_item(menu, 'Exit', self.on_exit)
+            self.create_menu_item(menu, 'Exit', self.on_exit)
             return menu
 
         def set_icon(self, path):
@@ -54,9 +51,6 @@ try:
         def on_left_down(self, event):      
             frame.Show()
             
-        def on_hello(self, event):
-            frame.Show()
-
         def on_exit(self, event):
             wx.CallAfter(self.Destroy)
             self.frame.Close()
@@ -68,7 +62,6 @@ try:
             super().__init__(parent=None, title=title_, style=wx.CAPTION, pos=(5, 5), size=(1080, 600))        
             panel = wx.Panel(self)
             coluna = wx.BoxSizer(wx.VERTICAL) 
-            
             font = wx.Font(18, wx.DEFAULT, wx.NORMAL, wx.BOLD)
             self.title_txt = wx.StaticText(panel, label='FolderSync')
             self.title_txt.SetFont(font)
@@ -95,7 +88,6 @@ try:
             self.cb1 = wx.CheckBox(panel, label='Events View')
             self.cb1.SetValue(True)
             self.cb1.Bind(wx.EVT_CHECKBOX, self.check_events, self.cb1)
-
             self.logpanel = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50,400))
             coluna.Add(linha_titulo, 0, wx.CENTER)
             coluna.AddSpacer(10)
@@ -138,10 +130,6 @@ try:
             frame.led3.SetBackgroundColour('Red')
             frame.Refresh()
 
-
-    metric_value = 0
-
-    print("Definindo classes...")
 
     class Event(LoggingEventHandler):
         try:
@@ -208,7 +196,6 @@ try:
             global frame
             frame.set_error_led()
 
-
     def filetree(source, dest, sync_name):
         files_destination_md5=dict()
         files_source_md5=dict()
@@ -238,10 +225,13 @@ try:
             for file in files_destination_md5:
                 path_dest = os.path.join(dest, file)
                 if file not in files_source_md5:
-                    aguarda_liberar_arquivo(path_dest) #na remocao nao verifica tamanho   
-                    os.remove(path_dest)
-                    adiciona_linha_log("Removido: " + str(path_dest))
-                    files_to_remove.append(file)
+                    try:
+                        os.remove(path_dest)
+                        adiciona_linha_log("Removido: " + str(path_dest))
+                        files_to_remove.append(file)
+                    except Exception as ERR:
+                        adiciona_linha_log("Erro ao remover arquivo." + str(ERR))
+                        frame.set_error_led()
 
             debug = 'destination.pop'  
             for item in files_to_remove:
@@ -261,7 +251,7 @@ try:
                         aguarda_liberar_arquivo(path_source) #testar
                         shutil.copy2(path_source, path_dest)
                         adiciona_linha_log("Sobrescrito: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize( str(path_dest) )) + "]")
-                if (round(time.time()) > ( thistime + sleep_time) ):
+                if (round(time.time()) > ( thistime + 120) ):
                     return 0   
             return 0
 
@@ -286,6 +276,7 @@ try:
                 pass
             if (round(time.time()) > ( thistime2 + 120) ):
                 adiciona_linha_log("Arquivo protegido contra gravacao por mais de 120 segundos, não permitindo a cópia.")
+                frame.set_error_led()
                 break
         try:
             in_file.close()            
@@ -378,7 +369,7 @@ try:
         linhas.reverse()
         remover=[]
         if (frame.cb1.GetValue() == False):
-            for idx, item in enumerate(linhas):
+            for item in linhas:
                 if ('<' in item):
                     remover.append(item)
             for item in remover:
@@ -386,7 +377,7 @@ try:
         frame.logpanel.SetValue(''.join(linhas))
     
     def syncs_thread():
-        while True:
+        while sleep_time > 0:
             global frame
             frame.led2.SetBackgroundColour('yellow')
             frame.Refresh()
@@ -406,8 +397,9 @@ try:
             time.sleep(sleep_time)
             
     if __name__ == "__main__":
-
+        
         print("Inicializando sistema de logging..")
+
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s - %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S') 
@@ -417,18 +409,19 @@ try:
             try:
                 host = (configs['SYNC_FOLDERS'][item]).split(', ')
                 observer.schedule(event_handler, host[0], recursive=False)
-
             except Exception as err:
                 adiciona_linha_log(str(err)+host[0])
                 global frame
                 frame.set_error_led()
 
         observer.start() 
-        print('Iniciando janela wx...')    
+
+        print('Iniciando janela wx...')  
+          
         try:      
             app = wx.App()
             frame = MyFrame()
-            frame.SetIcon(wx.Icon(diretorio))
+            frame.SetIcon(wx.Icon(icon_file))
             TaskBarIcon(frame)
             t = Thread(target=syncs_thread, daemon=True)
             u = Thread(target=send_status_metric, daemon=True)
