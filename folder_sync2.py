@@ -137,9 +137,12 @@ try:
                 LoggingEventHandler()
                 adiciona_linha_log(str(event))
                 path_event = str(event.src_path)
+                filenamesize = (len(getfilename(path_event)))
+                sliceposition = len(path_event)- (filenamesize)
+                path_event_dir = os.path.join(path_event[0:sliceposition],'')
                 for sync in configs['SYNC_FOLDERS']:
                     paths = (configs['SYNC_FOLDERS'][sync]).split(', ')
-                    if paths[0] in path_event:
+                    if os.path.join(paths[0], '') == path_event_dir:
                         event_operations(path_event, paths[1], sync, event)
                 
         except Exception as err:
