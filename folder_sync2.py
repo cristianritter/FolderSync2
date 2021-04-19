@@ -14,13 +14,14 @@ try:
     print('Carregando configurações...')
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
     configuration = parse_config.ConfPacket()
-    configs = configuration.load_config('SYNC_FOLDERS, LOG_FOLDER, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
+    configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
     sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])
     TRAY_TOOLTIP = 'FolderSync - ' + configs['SYNC_NAME']['name']
     icon_file = os.path.join(ROOT_DIR, 'icon.png')
     sincronizando = False
     evento_acontecendo = False
     metric_value = 0
+    panel_update_time = 0
     
     print("Definindo classes...")
 
@@ -179,8 +180,12 @@ try:
         mes_ano = datetime.now().strftime('_%Y%m')
         print(dataFormatada, texto)
         try:
-            log_file = configs['LOG_FOLDER']['log_folder']+'log'+mes_ano+'.txt'
-            f = open(log_file, "a")
+            log_file = 'log'+mes_ano+'.txt'
+            log_path = os.path.join(ROOT_DIR, 'logs')
+            log_pathfile = (os.path.join(log_path, log_file))
+            if (not os.path.exists(log_path)):
+                os.mkdir(log_path)
+            f = open(log_pathfile, "a")
             f.write(dataFormatada + ' ' + texto +"\n")
             f.close()
         except Exception as err:
@@ -188,6 +193,29 @@ try:
             global frame
             frame.set_error_led()
         update_logs()
+
+    def update_logs():
+        global frame
+        global panel_update_time
+        if ((panel_update_time + 1) > int(time.time()) ):
+            return
+        panel_update_time = int(time.time())
+        mes_ano = datetime.now().strftime('_%Y%m')
+        log_file = 'log'+mes_ano+'.txt'
+        log_pathfile = os.path.join(ROOT_DIR, 'logs', log_file)
+        if not os.path.exists(log_pathfile):
+            return
+        f = open(log_pathfile, "r")
+        linhas = f.readlines(20000000)
+        linhas.reverse()
+        remover=[]
+        if (frame.cb1.GetValue() == False):
+            for item in linhas:
+                if ('<' in item):
+                    remover.append(item)
+            for item in remover:
+                linhas.remove(item)
+        frame.logpanel.SetValue(''.join(linhas))
             
     def getfilename(filepath):
         try:
@@ -361,23 +389,6 @@ try:
             global frame
             frame.set_error_led()
 
-    def update_logs():
-        global frame
-        mes_ano = datetime.now().strftime('_%Y%m')
-        log_file = configs['LOG_FOLDER']['log_folder']+'log'+mes_ano+'.txt'
-        if not os.path.exists(log_file):
-            return
-        f = open(log_file, "r")
-        linhas = f.readlines(20000000)
-        linhas.reverse()
-        remover=[]
-        if (frame.cb1.GetValue() == False):
-            for item in linhas:
-                if ('<' in item):
-                    remover.append(item)
-            for item in remover:
-                linhas.remove(item)
-        frame.logpanel.SetValue(''.join(linhas))
     
     def syncs_thread():
         while sleep_time > 0:
@@ -422,7 +433,7 @@ try:
         print('Iniciando janela wx...')  
           
         try:      
-            app = wx.App()
+            app = wx.App()  
             frame = MyFrame()
             frame.SetIcon(wx.Icon(icon_file))
             TaskBarIcon(frame)
@@ -435,11 +446,8 @@ try:
 
         except Exception as Err:
             adiciona_linha_log(str(Err))
-            #observer.stop()   
             frame.set_error_led()
-
-        #observer.join()
-        
+      
 except Exception as ERR:
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
     dire = os.path.join(ROOT_DIR, 'ERRO.TXT')
