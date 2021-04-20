@@ -21,7 +21,8 @@ try:
     sincronizando = False
     evento_acontecendo = False
     metric_value = 0
-    panel_update_time = 0
+   # panel_update_time = 0
+    updating_logs = False
     
     print("Definindo classes...")
 
@@ -195,11 +196,15 @@ try:
         update_logs()
 
     def update_logs():
-        global frame
-        global panel_update_time
-        if ((panel_update_time + 1) > int(time.time()) ):
+        global updating_logs
+        if updating_logs:
             return
-        panel_update_time = int(time.time())
+        updating_logs = True
+        global frame
+     #   global panel_update_time
+     #   if ((panel_update_time + 1) > int(time.time()) ):
+     #       return
+     #   panel_update_time = int(time.time())
         mes_ano = datetime.now().strftime('_%Y%m')
         log_file = 'log'+mes_ano+'.txt'
         log_pathfile = os.path.join(ROOT_DIR, 'logs', log_file)
@@ -216,6 +221,7 @@ try:
             for item in remover:
                 linhas.remove(item)
         frame.logpanel.SetValue(''.join(linhas))
+        updating_logs = False
             
     def getfilename(filepath):
         try:
