@@ -17,11 +17,10 @@ try:
     configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
     sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])
     TRAY_TOOLTIP = 'FolderSync - ' + configs['SYNC_NAME']['name']
-    icon_file = os.path.join(ROOT_DIR, 'icon.png')
+    task_icon = os.path.join(ROOT_DIR, 'task_icon.png')
     sincronizando = False
     evento_acontecendo = False
     metric_value = 0
-   # panel_update_time = 0
     updating_logs = False
     
     print("Definindo classes...")
@@ -30,7 +29,7 @@ try:
         def __init__(self, frame):
             self.frame = frame
             super(TaskBarIcon, self).__init__()
-            self.set_icon(icon_file)
+            self.set_icon(task_icon)
             self.Bind(wx.adv.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
 
         def create_menu_item(self, menu, label, func):
@@ -154,6 +153,7 @@ try:
 
     def send_status_metric():
         while 1:
+            update_logs()
             time.sleep(int(configs['ZABBIX']['send_metrics_interval']))
             global metric_value
             global frame
@@ -201,14 +201,11 @@ try:
             return
         updating_logs = True
         global frame
-     #   global panel_update_time
-     #   if ((panel_update_time + 1) > int(time.time()) ):
-     #       return
-     #   panel_update_time = int(time.time())
         mes_ano = datetime.now().strftime('_%Y%m')
         log_file = 'log'+mes_ano+'.txt'
         log_pathfile = os.path.join(ROOT_DIR, 'logs', log_file)
         if not os.path.exists(log_pathfile):
+            updating_logs = False
             return
         f = open(log_pathfile, "r")
         linhas = f.readlines(20000000)
@@ -381,6 +378,7 @@ try:
 
     def sync_all_folders():
         try:
+            update_logs()
             error_counter = 0
             for item in configs['SYNC_FOLDERS']:
                 time.sleep(0.1)
@@ -441,7 +439,7 @@ try:
         try:      
             app = wx.App()  
             frame = MyFrame()
-            frame.SetIcon(wx.Icon(icon_file))
+            frame.SetIcon(wx.Icon(task_icon))
             TaskBarIcon(frame)
             t = Thread(target=syncs_thread, daemon=True)
             u = Thread(target=send_status_metric, daemon=True)
