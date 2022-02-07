@@ -13,33 +13,34 @@ class ZabbixSender_:
     server - zabbix serve ip address \n
     port - zabbix port number \n
     idx -  indice da variavel de lista que possui os dados de metrica a serem enviados \n
-    status - lista que traz os dados de metrica
+    metric - lista que traz os dados de metrica
 
     """
-    def __init__(self, metric_interval, hostname, key, server, port, idx, status):
+    def __init__(self, metric_interval, hostname, key, server, port, idx, metric):
         self.metric_interval = int(metric_interval)
         self.hostname = hostname
         self.key = key
         self.server = server
         self.port = int(port)
-        self.status = status
+        self.metric = metric
         self.idx = idx
         
-    def send_metric(self, status):
+    def send_metric(self):
         '''Rotina que continuamente envia as metricas               
         Recebe um array do tipo lista e utiliza os dados de indice da classe criada. Funcionam como ponteiro, \n
         portanto ao alterar os valores na lista se altera também o valor da metrica enviada.
         '''
         try:
             while True:
-                time.sleep(self.metric_interval)       
+                time.sleep(self.metric_interval)  
                 try:
                     packet = [
-                        ZabbixMetric(self.hostname, self.key, str(status[self.idx]))
+                        ZabbixMetric(self.hostname, self.key, str(self.metric[self.idx]))
                     ]
                     ZabbixSender(zabbix_server=self.server, zabbix_port=self.port).send(packet)
                 except Exception as Err:
                     print(f"Falha de conexão com o Zabbix - {Err}")
+        
         except Exception as Err:
             print(f"Erro: {Err}")
             time.sleep(30)
@@ -49,7 +50,7 @@ class ZabbixSender_:
         Método que inicia um thread de envio de metricas para o zabbix
         """
         try:
-            u = Thread(target=self.send_metric, args=[self.status], daemon=True)
+            u = Thread(target=self.send_metric, args=[], daemon=True)
             u.start()
         except Exception as Err:
             print(f'Erro: {Err}')

@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 
-class FileLogger:
+class FileLogger_:
     """Registrador de logs em arquivos.\n
     Recebe como argumento o nome da pasta onde os logs serão adicionados,\n
     essa pasta será criada dentro do diretorio raiz do programa."""  
@@ -24,6 +24,7 @@ class FileLogger:
         
         try:
             if not os.path.isdir(self.LOGS_DIR):
+                print('entrou')
                 os.makedirs(self.LOGS_DIR)
 
             log_file = os.path.join(self.LOGS_DIR, f'log{mes_ano}.txt')

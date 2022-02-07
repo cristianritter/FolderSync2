@@ -9,7 +9,7 @@ configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, 
 
 
 class Event(LoggingEventHandler):
-    """def dispatch(self, event): 
+    def dispatch(self, event): 
         LoggingEventHandler()
         #adiciona_linha_log(str(event))
         print(event)
@@ -22,7 +22,7 @@ class Event(LoggingEventHandler):
             if os.path.join(paths[0], '') == path_event_dir:
                 pass
                 #event_operations(path_event, paths[1], sync, event)
-    """
+    
     def getfilename(self, filepath):
         try:
             pathlist = filepath.split('\\')
