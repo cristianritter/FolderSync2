@@ -1,16 +1,11 @@
 import wx
 import os
-import parse_config
 from datetime import datetime
 import locale
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-configuration = parse_config.ConfPacket()
-configs = configuration.load_config('SYNC_NAME, SYNC_TIMES')
 
 task_icon = os.path.join(ROOT_DIR, 'task_icon.png')
-sleep_time = int(configs['SYNC_TIMES']['sync_with_no_events_time'])  
-title_ = 'FolderSync by EngNSC - ' + configs['SYNC_NAME']['name']
 
 def InitLocale(self):
     """
@@ -31,11 +26,13 @@ wx.App.InitLocale = InitLocale   #substituindo metodo que estava gerando erro po
 
 
 class MyFrame(wx.Frame):    
-    def __init__(self, status, logger_, zabbix_param):
-        super().__init__(parent=None, title=title_, style=wx.CAPTION, pos=(5, 5), size=(1080, 600))        
+    def __init__(self, status, logger_, zabbix_instance, configs):
+        self.configs = configs      
+        title_ = 'FolderSync by EngNSC - ' + self.configs['SYNC_NAME']['name']
+        super().__init__(parent=None, title=title_, style=wx.CAPTION, pos=(5, 5), size=(1080, 600))  
         self.status = status
         self.logger_ = logger_
-        self.zabbix_param = zabbix_param
+        self.zabbix_instance = zabbix_instance
         self.SetIcon(wx.Icon(task_icon))
         panel = wx.Panel(self)
         coluna = wx.BoxSizer(wx.VERTICAL) 
@@ -64,7 +61,7 @@ class MyFrame(wx.Frame):
         self.clear_btn.SetFont(font)
         self.cb1 = wx.CheckBox(panel, label='Events View')
         self.cb1.SetValue(True)
-        self.cb1.Bind(wx.EVT_CHECKBOX, self.update_logs, self.cb1)
+        self.cb1.Bind(wx.EVT_CHECKBOX, self.update_logs)
         self.logpanel = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50,400))
         coluna.Add(linha_titulo, 0, wx.CENTER)
         coluna.AddSpacer(10)
@@ -134,7 +131,7 @@ class MyFrame(wx.Frame):
         self.Refresh()
 
 
-    def update_logs(self):
+    def update_logs(self, event=None):
         if self.status['updating_logs']:
             return
         self.status['updating_logs'] = True
@@ -161,6 +158,18 @@ class MyFrame(wx.Frame):
 
 
 if __name__ == '__main__':
+    
+    import parse_config
+    '''Carregando informações do diretório raiz do projeto'''
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+    
+
+    '''Carregando configurações...'''
+    configuration = parse_config.ConfPacket()
+    configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
+
+
+    
     status = {
         'sincronizando' : False,
         'evento_acontecendo' : False,
@@ -173,5 +182,5 @@ if __name__ == '__main__':
     
     app = wx.App()  
  
-    MyFrame_ = MyFrame(status, logger_, zabbix_metric)
+    MyFrame_ = MyFrame(status, logger_, zabbix_metric, configs)
     app.MainLoop()

@@ -1,0 +1,136 @@
+07/02/2022 12:40:10 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto.txt', is_directory=False>
+07/02/2022 12:43:12 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto.txt', is_directory=False>
+07/02/2022 12:43:12 - Copiado: C:\teste\Novo Documento de Texto.txt[0] to C:\teste2\novo documento de texto.txt[0]
+07/02/2022 12:43:29 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto.txt', is_directory=False>
+07/02/2022 12:43:29 - Removido: C:\teste2\novo documento de texto.txt
+07/02/2022 12:43:36 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto.txt', is_directory=False>
+07/02/2022 12:43:36 - Copiado: C:\teste\Novo Documento de Texto.txt[0] to C:\teste2\novo documento de texto.txt[0]
+07/02/2022 12:43:39 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia.txt', is_directory=False>
+07/02/2022 12:43:39 - Copiado: C:\teste\Novo Documento de Texto - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia.txt[0]
+07/02/2022 12:43:39 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia.txt', is_directory=False>
+07/02/2022 12:43:39 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (2).txt', is_directory=False>
+07/02/2022 12:43:39 - Copiado: C:\teste\Novo Documento de Texto - Cópia (2).txt[0] to C:\teste2\novo documento de texto - cópia (2).txt[0]
+07/02/2022 12:43:39 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (2).txt', is_directory=False>
+07/02/2022 12:43:39 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (3).txt', is_directory=False>
+07/02/2022 12:43:39 - Copiado: C:\teste\Novo Documento de Texto - Cópia (3).txt[0] to C:\teste2\novo documento de texto - cópia (3).txt[0]
+07/02/2022 12:43:39 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (3).txt', is_directory=False>
+07/02/2022 12:43:39 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (4).txt', is_directory=False>
+07/02/2022 12:43:39 - Copiado: C:\teste\Novo Documento de Texto - Cópia (4).txt[0] to C:\teste2\novo documento de texto - cópia (4).txt[0]
+07/02/2022 12:43:39 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (4).txt', is_directory=False>
+07/02/2022 12:43:40 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (5).txt', is_directory=False>
+07/02/2022 12:43:40 - Copiado: C:\teste\Novo Documento de Texto - Cópia (5).txt[0] to C:\teste2\novo documento de texto - cópia (5).txt[0]
+07/02/2022 12:43:40 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (5).txt', is_directory=False>
+07/02/2022 12:43:40 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (6).txt', is_directory=False>
+07/02/2022 12:43:40 - Copiado: C:\teste\Novo Documento de Texto - Cópia (6).txt[0] to C:\teste2\novo documento de texto - cópia (6).txt[0]
+07/02/2022 12:43:40 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (6).txt', is_directory=False>
+07/02/2022 12:43:40 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (7).txt', is_directory=False>
+07/02/2022 12:43:40 - Copiado: C:\teste\Novo Documento de Texto - Cópia (7).txt[0] to C:\teste2\novo documento de texto - cópia (7).txt[0]
+07/02/2022 12:43:40 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (7).txt', is_directory=False>
+07/02/2022 12:43:41 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (8).txt', is_directory=False>
+07/02/2022 12:43:41 - Copiado: C:\teste\Novo Documento de Texto - Cópia (8).txt[0] to C:\teste2\novo documento de texto - cópia (8).txt[0]
+07/02/2022 12:43:41 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (8).txt', is_directory=False>
+07/02/2022 12:43:42 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (9).txt', is_directory=False>
+07/02/2022 12:43:42 - Copiado: C:\teste\Novo Documento de Texto - Cópia (9).txt[0] to C:\teste2\novo documento de texto - cópia (9).txt[0]
+07/02/2022 12:43:42 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (9).txt', is_directory=False>
+07/02/2022 12:43:43 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (10).txt', is_directory=False>
+07/02/2022 12:43:43 - Copiado: C:\teste\Novo Documento de Texto - Cópia (10).txt[0] to C:\teste2\novo documento de texto - cópia (10).txt[0]
+07/02/2022 12:43:43 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (10).txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (10) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (10) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (10) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (10) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (11).txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (11).txt[0] to C:\teste2\novo documento de texto - cópia (11).txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (11).txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (2) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (2) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (2) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (2) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (3) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (3) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (3) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (3) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (4) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (4) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (4) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (4) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (5) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (5) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (5) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (5) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (6) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (6) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (6) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (6) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (7) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (7) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (7) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (7) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (8) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (8) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (8) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (8) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - <FileCreatedEvent: event_type=created, src_path='C:\\teste\\Novo Documento de Texto - Cópia (9) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:08 - Copiado: C:\teste\Novo Documento de Texto - Cópia (9) - Cópia.txt[0] to C:\teste2\novo documento de texto - cópia (9) - cópia.txt[0]
+07/02/2022 12:46:08 - <FileModifiedEvent: event_type=modified, src_path='C:\\teste\\Novo Documento de Texto - Cópia (9) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (10) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (10) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (10).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (10).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (11).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (11).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (2) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (2) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (2).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (2).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (3) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (3) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (3).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (3).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (4) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (4) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (4).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (4).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (5) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (5) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (5).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (5).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (6) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (6) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (6).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (6).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (7) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (7) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (7).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (7).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (8) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (8) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (8).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (8).txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (9) - Cópia.txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (9) - cópia.txt
+07/02/2022 12:46:16 - <FileDeletedEvent: event_type=deleted, src_path='C:\\teste\\Novo Documento de Texto - Cópia (9).txt', is_directory=False>
+07/02/2022 12:46:16 - Removido: C:\teste2\novo documento de texto - cópia (9).txt
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (10) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (10) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (10).txt[0] to C:\teste2\novo documento de texto - cópia (10).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (11).txt[0] to C:\teste2\novo documento de texto - cópia (11).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (2) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (2) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (2).txt[0] to C:\teste2\novo documento de texto - cópia (2).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (3) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (3) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (3).txt[0] to C:\teste2\novo documento de texto - cópia (3).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (4) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (4) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (4).txt[0] to C:\teste2\novo documento de texto - cópia (4).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (5) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (5) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (5).txt[0] to C:\teste2\novo documento de texto - cópia (5).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (6) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (6) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (6).txt[0] to C:\teste2\novo documento de texto - cópia (6).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (7) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (7) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (7).txt[0] to C:\teste2\novo documento de texto - cópia (7).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (8) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (8) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (8).txt[0] to C:\teste2\novo documento de texto - cópia (8).txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (9) - cópia.txt[0] to C:\teste2\novo documento de texto - cópia (9) - cópia.txt[0]
+07/02/2022 12:46:44 - Copiado: C:\teste\novo documento de texto - cópia (9).txt[0] to C:\teste2\novo documento de texto - cópia (9).txt[0]
+07/02/2022 12:46:45 - Copiado: C:\teste\novo documento de texto - cópia - cópia.txt[0] to C:\teste2\novo documento de texto - cópia - cópia.txt[0]
+07/02/2022 12:46:45 - Copiado: C:\teste\novo documento de texto - cópia.txt[0] to C:\teste2\novo documento de texto - cópia.txt[0]
+07/02/2022 12:46:45 - Copiado: C:\teste\novo documento de texto.txt[0] to C:\teste2\novo documento de texto.txt[0]

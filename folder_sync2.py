@@ -60,7 +60,7 @@ try:
 
     """Inicializando a interface gráfica"""
     app = wx.App()  
-    frame = MyFrame(status=status, logger_=logger_, zabbix_param= zsender)       # Janela principal
+    frame = MyFrame(status=status, logger_=logger_, zabbix_instance= zsender, configs=configs)       # Janela principal
     TaskBarIcon(frame)      # Icone de bandeja
 
 
@@ -74,7 +74,7 @@ try:
                         datefmt='%Y-%m-%d %H:%M:%S') 
     
 
-    event_handler = MyEvent(mylogger=logger_)
+    event_handler = MyEvent(mylogger=logger_, configs=configs, fileoperations=operations_)
 
 
     observer = Observer() 
@@ -104,7 +104,7 @@ try:
             frame.set_error_led()
       
 except Exception as ERR:
-    print('main'+ str(ERR))
+    print('mainloop'+ str(ERR))
     logger_.adiciona_linha_log(str(ERR)+'\n')
 
 
