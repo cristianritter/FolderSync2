@@ -11,7 +11,6 @@ from FileLogger import FileLogger_
 from FileOperations import FileOperations_
 
 from watchdog.observers import Observer
-from threading import Thread
 import wx.adv
 import wx
 
@@ -75,7 +74,7 @@ try:
                         datefmt='%Y-%m-%d %H:%M:%S') 
     
 
-    event_handler = MyEvent()
+    event_handler = MyEvent(mylogger=logger_)
 
 
     observer = Observer() 

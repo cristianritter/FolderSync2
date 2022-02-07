@@ -37,5 +37,5 @@ class FileLogger_:
             print(f'Erro durante registro no arquivo de log. {err}')
          
 if __name__ == '__main__':
-    Logger = FileLogger(pasta_de_logs='logs')
+    Logger = FileLogger_(pasta_de_logs='logs')
     Logger.adiciona_linha_log('arg1', 'arg2', 'arg3')

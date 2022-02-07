@@ -9,9 +9,13 @@ configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, 
 
 
 class Event(LoggingEventHandler):
+    def __init__(self, logger=None, mylogger=None):
+        super().__init__(logger)
+        self.my_logger = mylogger
+
     def dispatch(self, event): 
         LoggingEventHandler()
-        #adiciona_linha_log(str(event))
+        self.my_logger.adiciona_linha_log(str(event))
         print(event)
         path_event = str(event.src_path)
         filenamesize = (len(self.getfilename(path_event)))
@@ -30,8 +34,7 @@ class Event(LoggingEventHandler):
             return (filename)
         except Exception as Err:
             pass
-            #adiciona_linha_log(str(Err)+'Getfilename')
+            self.my_logger.adiciona_linha_log(str(Err)+'Getfilename')
 
         
-  #  except Exception as err:
-  #      adiciona_linha_log("Logging event handler erro - "+str(err))
+  
