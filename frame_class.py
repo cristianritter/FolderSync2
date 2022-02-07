@@ -83,16 +83,19 @@ class MyFrame(wx.Frame):
         linha_led.AddSpacer(20)
         linha_led.Add(self.clear_btn, 0, wx.TOP, 10)
         hide_button = wx.Button(panel, label='Fechar')
-        hide_button.Bind(wx.EVT_BUTTON, self.Hide)            
+        hide_button.Bind(wx.EVT_BUTTON, self.esconder_janela)            
         coluna.Add(linha_filter, 0, wx.CENTER) 
         coluna.Add(linha_led, 0, wx.CENTER) 
         coluna.Add(hide_button, 0, wx.TOP | wx.CENTER, 30)
         panel.SetSizer(coluna)
         self.Show()
 
+    def esconder_janela(self, event):
+        self.Hide()
+
 
     def set_event_in_progress_led(self, event=None):
-        self.led1.SetBackgroundColour('Red')
+        self.set_event_in_progress_led()
         self.Refresh()
 
 
@@ -167,7 +170,6 @@ if __name__ == '__main__':
     '''Carregando configurações...'''
     configuration = parse_config.ConfPacket()
     configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
-
 
     
     status = {
