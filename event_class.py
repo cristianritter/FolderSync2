@@ -14,9 +14,7 @@ class Event(LoggingEventHandler):
         assert isinstance(self.my_logger, FileLogger_)
         assert isinstance(self.fileoperations, FileOperations_)
         
-        LoggingEventHandler()
         self.my_logger.adiciona_linha_log(str(event))
-        print(event)
         path_event = str(event.src_path)
         filenamesize = (len(self.fileoperations.getfilename(path_event)))
         sliceposition = len(path_event)- (filenamesize)
@@ -24,7 +22,6 @@ class Event(LoggingEventHandler):
         for sync in self.configs['SYNC_FOLDERS']:
             paths = (self.configs['SYNC_FOLDERS'][sync]).split(', ')
             if os.path.join(paths[0], '') == path_event_dir:
-                pass
                 self.fileoperations.event_operations(path_event, paths[1], sync, event)
     
 

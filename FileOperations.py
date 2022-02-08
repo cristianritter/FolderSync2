@@ -1,6 +1,7 @@
 import time
 import shutil
 import os
+import sys
 from threading import Thread
 from ZabbixSender import ZabbixSender_
 from FileLogger import FileLogger_
@@ -142,8 +143,8 @@ class FileOperations_():
                 self.frame.zabbix_instance.metric[self.frame.zabbix_instance.idx] = 1
                 self.frame.set_error_led()
 
-        except Exception as err:
-            self.logger_.adiciona_linha_log("Falha durante execução da função sync_all_folders - "+str(err))
+        except Exception as Err:
+            self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             self.frame.set_error_led()
 
 
@@ -164,7 +165,7 @@ class FileOperations_():
             time.sleep(sleep_time)
 
 
-    def start_sync_thread(self):
+    def start_timesync_thread(self):
         """
         Método que inicia um thread de envio de metricas para o zabbix
         """
@@ -225,7 +226,7 @@ class FileOperations_():
                                 self.frame.set_error_led()
             self.frame.clear_event_in_progress_led()
         except Exception as Err:
-            self.logger_.adiciona_linha_log(str(Err)) 
+            self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             self.frame.zabbix_instance.metric = 1
         self.frame.status['evento_acontecendo'] = False
 
@@ -237,8 +238,9 @@ class FileOperations_():
             filename = (pathlist[len(pathlist)-1]).lower()
             return (filename)
         except Exception as Err:
-            pass
-            self.logger_.adiciona_linha_log(str(Err)+'Getfilename')
+            self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+
+
 
 
 if __name__ == '__main__':
@@ -295,3 +297,4 @@ if __name__ == '__main__':
     while 1:
         pass
         time.sleep(1)
+        fileoperations_.checkDirectory()

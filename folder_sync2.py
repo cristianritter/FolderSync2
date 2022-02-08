@@ -1,6 +1,7 @@
 import logging
 import parse_config
 import os
+import sys
 
 from taskbar_class import TaskBarIcon
 from frame_class import MyFrame
@@ -89,7 +90,7 @@ try:
             observer.start() 
             
             """Start threading de sincronismo de arquivos"""
-            operations_.start_sync_thread()
+            operations_.start_timesync_thread()
 
             """Start threading de envio de metricas para o zabbix"""
             zsender.start_zabbix_thread()
@@ -99,12 +100,10 @@ try:
             app.MainLoop()
 
         except Exception as Err:
-            print('erro')
-            logger_.adiciona_linha_log('trheads' + str(Err))
+            logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             frame.set_error_led()
       
 except Exception as ERR:
-    print('mainloop'+ str(ERR))
-    logger_.adiciona_linha_log(str(ERR)+'\n')
+    logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
 
 

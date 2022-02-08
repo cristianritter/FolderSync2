@@ -8,10 +8,12 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Roo
 task_icon = os.path.join(ROOT_DIR, 'task_icon.png')
 
 def InitLocale(self):
+
     """
     Substituição do método padrão devido a problemas relacionados a detecção de locale no Windows 7.
     Não foi testado no windows 10.
     """
+
     self.ResetLocale()
     try:
         lang, _ = locale.getdefaultlocale()
@@ -26,68 +28,88 @@ wx.App.InitLocale = InitLocale   #substituindo metodo que estava gerando erro po
 
 
 class MyFrame(wx.Frame):    
-    def __init__(self, status, logger_, zabbix_instance, configs):
+    def __init__(self, status, logger_, zabbix_instance, configs): 
+        super().__init__(parent=None, style=wx.CAPTION, pos=(5, 5), size=(1080, 680))  
+        self.SetIcon(wx.Icon(task_icon))
+
         self.configs = configs      
-        title_ = 'FolderSync by EngNSC - ' + self.configs['SYNC_NAME']['name']
-        super().__init__(parent=None, title=title_, style=wx.CAPTION, pos=(5, 5), size=(1080, 600))  
         self.status = status
         self.logger_ = logger_
         self.zabbix_instance = zabbix_instance
-        self.SetIcon(wx.Icon(task_icon))
+        self.Title = f"FolderSync by EngNSC - {self.configs['SYNC_NAME']['name']}"
+
+        """Criação do painel"""
         panel = wx.Panel(self)
-        coluna = wx.BoxSizer(wx.VERTICAL) 
-        font = wx.Font(18, wx.DEFAULT, wx.NORMAL, wx.BOLD)
-        self.title_txt = wx.StaticText(panel, label='FolderSync')
-        self.title_txt.SetFont(font)
-        font = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.BOLD, underline=True)
-        self.subtitle_txt = wx.StaticText(panel, label='- Log de eventos -')
-        self.subtitle_txt.SetFont(font)
-        linha_titulo = wx.BoxSizer(wx.HORIZONTAL)
-        linha_titulo.Add(self.title_txt, 0, wx.TOP, 20)
-        linha_titulo.AddSpacer(30)
-        linha_titulo.Add(self.subtitle_txt, 0, wx.TOP, 30)
+
+        """Criação dos items da interface"""
+        StaticTextTittle = wx.StaticText(panel, label='FolderSync')
+        StaticTextSubtitle = wx.StaticText(panel, label='- Log de eventos -')
+      
         self.led1 =  wx.StaticText(panel, wx.ID_ANY, label='', size=(20,15))
-        self.ld1txt = wx.StaticText(panel, label='Event in progress')
+        ld1txt = wx.StaticText(panel, label='Event in progress')
         self.led2 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,15))
-        self.ld2txt = wx.StaticText(panel, label='All Sync in progress')
+        ld2txt = wx.StaticText(panel, label='All Sync in progress')
         self.led3 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,15))
-        self.ld3txt = wx.StaticText(panel, label='Error detected')
+        ld3txt = wx.StaticText(panel, label='Error detected')
+
+        self.logpanel = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50,400))
+        self.clear_btn = wx.StaticText(panel, label='(Limpar Erros)')
+        self.cb1 = wx.CheckBox(panel, label='Events View')
+        self.cb1.SetValue(True)
+        hide_button = wx.Button(panel, label='Esconder')
+
+
+        """Configuração de Fonts"""
+        TittleFont = wx.Font(18, wx.DEFAULT, wx.NORMAL, wx.BOLD)
+        StaticTextTittle.SetFont(TittleFont)
+
+        SubTitleFont = wx.Font(9, wx.DEFAULT, wx.NORMAL, wx.BOLD, underline=True)
+        StaticTextSubtitle.SetFont(SubTitleFont)
+
+        ButtonFont = wx.Font(7, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.BOLD, underline=True)
+        self.clear_btn.SetFont(ButtonFont)
+
+
+        """Configuração de Items Colors"""    
         self.led1.SetBackgroundColour('gray')
         self.led2.SetBackgroundColour('gray')
         self.led3.SetBackgroundColour('gray')
-        self.clear_btn = wx.StaticText(panel, label='(Limpar Erros)')
+
+
+        """Items Binds"""
         self.clear_btn.Bind(wx.EVT_LEFT_DOWN, self.clear_error_led)
-        font = wx.Font(7, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.BOLD, underline=True)
-        self.clear_btn.SetFont(font)
-        self.cb1 = wx.CheckBox(panel, label='Events View')
-        self.cb1.SetValue(True)
         self.cb1.Bind(wx.EVT_CHECKBOX, self.update_logs)
-        self.logpanel = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50,400))
-        coluna.Add(linha_titulo, 0, wx.CENTER)
-        coluna.AddSpacer(10)
-        coluna.Add(self.logpanel, 0, wx.ALL | wx.EXPAND, 2) 
+        hide_button.Bind(wx.EVT_BUTTON, self.Hide)            
+
+        """Organização dos items [containers]"""
+        
+        linha_titulo = wx.BoxSizer(wx.HORIZONTAL)
+        linha_titulo.Add(StaticTextTittle, 0, wx.ALL, border=5)
+        linha_titulo.Add(StaticTextSubtitle, 0, wx.ALL, border=15)
+
         linha_filter = wx.BoxSizer(wx.HORIZONTAL)
         linha_filter.Add(self.cb1, 0, wx.TOP, 5)
+
         linha_led = wx.BoxSizer(wx.HORIZONTAL)
-        linha_led.Add(self.led1, 0, wx.TOP, 5)
-        linha_led.AddSpacer(10)
-        linha_led.Add(self.ld1txt, 0, wx.TOP, 5)
+        linha_led.Add(self.led1, 0, wx.ALL, border=5)
+        linha_led.Add(ld1txt, 0, wx.ALL, border=5)
         linha_led.AddSpacer(20)
-        linha_led.Add(self.led2, 0, wx.TOP, 5)
-        linha_led.AddSpacer(10)
-        linha_led.Add(self.ld2txt, 0, wx.TOP, 5)
+        linha_led.Add(self.led2, 0, wx.ALL, border=5)
+        linha_led.Add(ld2txt, 0, wx.ALL, border=5)
         linha_led.AddSpacer(20)
-        linha_led.Add(self.led3, 0, wx.TOP, 5)
-        linha_led.AddSpacer(10)
-        linha_led.Add(self.ld3txt, 0, wx.TOP, 5)
+        linha_led.Add(self.led3, 0, wx.ALL, border=5)
+        linha_led.Add(ld3txt, 0, wx.ALL, border=5)
         linha_led.AddSpacer(20)
-        linha_led.Add(self.clear_btn, 0, wx.TOP, 10)
-        hide_button = wx.Button(panel, label='Fechar')
-        hide_button.Bind(wx.EVT_BUTTON, self.Hide)            
-        coluna.Add(linha_filter, 0, wx.CENTER) 
-        coluna.Add(linha_led, 0, wx.CENTER) 
-        coluna.Add(hide_button, 0, wx.TOP | wx.CENTER, 30)
-        panel.SetSizer(coluna)
+        linha_led.Add(self.clear_btn, 0, wx.ALL, border=5)
+        
+        coluna_todo_conteudo = wx.BoxSizer(wx.VERTICAL) 
+        coluna_todo_conteudo.Add(linha_titulo, 0, wx.CENTER | wx.ALL, border=10)
+        coluna_todo_conteudo.Add(self.logpanel, 0, wx.ALL | wx.EXPAND, 2) 
+        coluna_todo_conteudo.Add(linha_filter, 0, wx.ALIGN_CENTER | wx.ALL, border=10) 
+        coluna_todo_conteudo.Add(linha_led, 0, wx.CENTER) 
+        coluna_todo_conteudo.Add(hide_button, 0, wx.TOP | wx.CENTER, 5)
+    
+        panel.SetSizer(coluna_todo_conteudo)
         self.Show()
 
 
@@ -132,21 +154,29 @@ class MyFrame(wx.Frame):
 
 
     def update_logs(self, event=None):
-        if self.status['updating_logs']:
-            return
-        self.status['updating_logs'] = True
-        mes_ano = datetime.now().strftime('_%Y%m')
-        log_file = 'log'+mes_ano+'.txt'
+
+        """Atualiza o painel de logs"""
         
-        log_pathfile = os.path.join(ROOT_DIR, 'logs', log_file)
-        if not os.path.exists(log_pathfile):
+        if self.status['updating_logs']:        # evita que duas atualizações se iniciem ao mesmo tempo
+            return
+        else:
+            self.status['updating_logs'] = True
+
+        dataPartialLogFname = datetime.now().strftime('_%Y%m')
+        logFilename = f'log{dataPartialLogFname}.txt'
+        
+        log_pathfile = os.path.join(ROOT_DIR, 'logs', logFilename)
+        
+        if not os.path.exists(log_pathfile):            #retorna se o arquivo nao existir por alguma razão
             self.status['updating_logs'] = False
             return
 
-        f = open(log_pathfile, "r")
-        linhas = f.readlines(20000000)
-        linhas.reverse()
-        remover=[]
+        with open(log_pathfile, "r") as file:
+            linhas = file.readlines(20000000)
+        
+        linhas.reverse()        #reverse pois os logs mais antigos aparecem primeiro
+        
+        remover=[]              # rotina que atualiza informações do filtro
         if (self.cb1.GetValue() == False):
             for item in linhas:
                 if ('<' in item):
@@ -154,7 +184,8 @@ class MyFrame(wx.Frame):
             for item in remover:
                 linhas.remove(item)
         self.logpanel.SetValue(''.join(linhas))
-        self.status['updating_logs'] = False
+
+        self.status['updating_logs'] = False        # libera o sistema para uma nova atualização
 
 
 if __name__ == '__main__':
