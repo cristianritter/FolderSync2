@@ -112,9 +112,12 @@ class MyFrame(wx.Frame):
         panel.SetSizer(coluna_todo_conteudo)
         self.Show()
 
+    def esconder_janela(self, event):
+        self.Hide()
+
 
     def set_event_in_progress_led(self, event=None):
-        self.led1.SetBackgroundColour('Red')
+        self.set_event_in_progress_led()
         self.Refresh()
 
 
@@ -198,7 +201,6 @@ if __name__ == '__main__':
     '''Carregando configurações...'''
     configuration = parse_config.ConfPacket()
     configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
-
 
     
     status = {
