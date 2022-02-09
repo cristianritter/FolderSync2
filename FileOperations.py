@@ -6,18 +6,33 @@ from threading import Thread
 from ZabbixSender import ZabbixSender_
 from FileLogger import FileLogger_
 from frame_class import MyFrame
+from functools import wraps
+
+'''def defineInstanceTypes(func):
+    @wraps(func)
+    def inner(self, *args):
+        print (args)
+        assert isinstance(self.frame, MyFrame)      # verifica erros na passagem de argumentos e permite o uso do recurso autocompletar
+        assert isinstance(self.logger_, FileLogger_)
+        assert isinstance(self.frame.zabbix_instance, ZabbixSender_)
+        func(self, *args)
+    return inner'''
 
 
 class FileOperations_():
     def __init__(self, config_dict, frame_inst, logger_inst) -> None:
+        
+        """Inicialização da classe"""
+        
         self.configs = config_dict
         self.frame = frame_inst
         self.logger_ = logger_inst
-        assert isinstance(self.frame, MyFrame)      # verifica erros na passagem de argumentos e permite o uso do recurso autocompletar
-        assert isinstance(self.logger_, FileLogger_)
-   
+    
     def aguarda_liberar_arquivo(self, filepath_source):
-        assert isinstance(self.frame, MyFrame)      # verifica erros na passagem de argumentos e permite o uso do recurso autocompletar
+   
+        """Método que verifica se a criação do arquivo já foi finalizada antes de executar a cópia \n
+        Retorna True se o arquivo estiver preso e não pode ser aberto por algum motivo desconhecido."""
+   
         assert isinstance(self.logger_, FileLogger_)
 
         time_begin = round(time.time())
@@ -33,21 +48,20 @@ class FileOperations_():
             source_size2 = os.path.getsize( str(filepath_source) )
             
             try:
-                in_file = open(filepath_source, "rb") # opening for [r]eading as [b]inary
-                time.sleep(0.01)
-                in_file.close()            
+                with open(filepath_source, "rb") as in_file: # opening for [r]eading as [b]inary
+                    time.sleep(0.02)
             except:
                 pass
             
-            if (round(time.time()) > ( time_begin + 120) ):
-                self.logger_.adiciona_linha_log("Arquivo protegido contra gravacao por mais de 120 segundos, não permitindo a cópia.")
+            if (round(time.time()) > ( time_begin + 20) ):
+                self.logger_.adiciona_linha_log("Arquivo protegido contra gravacao por mais de 20 segundos, não permitindo a cópia.")
                 retorna_erro = True
                 break
         return retorna_erro
    
 
+    def filetree(self, source, dest, sync_name):  
 
-    def filetree(self, source, dest, sync_name):     
         assert isinstance(self.frame, MyFrame)      # verifica erros na passagem de argumentos e permite o uso do recurso autocompletar
         assert isinstance(self.logger_, FileLogger_)
 
@@ -149,33 +163,39 @@ class FileOperations_():
 
 
     def syncs_thread(self):
-        assert isinstance(self.frame, MyFrame)
-        sleep_time = int(self.configs['SYNC_TIMES']['sync_with_no_events_time'])
-        while sleep_time > 0:
-            self.frame.set_sync_waiting_led()
-            self.frame.status['sincronizando'] = True
-            if self.frame.status['evento_acontecendo']:
+        assert isinstance(self.logger_, FileLogger_)
+        try:
+            assert isinstance(self.frame, MyFrame)
+            sleep_time = int(self.configs['SYNC_TIMES']['sync_with_no_events_time'])
+            while sleep_time > 0:
+                self.frame.set_sync_waiting_led()
+                self.frame.status['sincronizando'] = True
+                if self.frame.status['evento_acontecendo']:
+                    self.frame.status['sincronizando'] = False
+                    time.sleep(1)
+                    continue
+                self.frame.set_sync_in_progress_led()
+                self.sync_all_folders()                                 #realiza rotina de sincronizar todos os diretorios
                 self.frame.status['sincronizando'] = False
-                time.sleep(1)
-                continue
-            self.frame.set_sync_in_progress_led()
-            self.sync_all_folders()                                 #realiza rotina de sincronizar todos os diretorios
-            self.frame.status['sincronizando'] = False
-            self.frame.clear_sync_in_progress_led()
-            time.sleep(sleep_time)
-
+                self.frame.clear_sync_in_progress_led()
+                time.sleep(sleep_time)
+        except Exception as Err:
+            self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+            self.frame.set_error_led()
+        
 
     def start_timesync_thread(self):
-        """
-        Método que inicia um thread de envio de metricas para o zabbix
-        """
-        try:
-            u = Thread(target=self.syncs_thread, args=[], daemon=True)
-            u.start()
-        except Exception as Err:
-            print(f'Erro: {Err}')
+        
+        """        Método que inicia um thread de envio de metricas para o zabbix"""
+
+        u = Thread(target=self.syncs_thread, args=[], daemon=True)
+        u.start()
+    
 
     def event_operations(self, filepath_source, path_dest, sync_name, event):
+
+        """Método reproduzido quando um evento é detectado em algum diretório monitorado"""
+
         assert isinstance(self.frame, MyFrame)
         assert isinstance(self.logger_, FileLogger_)
         assert isinstance(self.frame.zabbix_instance, ZabbixSender_)
@@ -190,7 +210,7 @@ class FileOperations_():
         except:
             sync_ext = []
         try:
-            filename = self.getfilename(filepath_source).lower()
+            filename = os.path.basename(filepath_source).lower()
             filepath_dest = os.path.join(path_dest, filename)
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
                 if (os.path.splitext(filename)[1][1:].lower() in sync_ext) or (len(sync_ext) == 0):    
@@ -231,18 +251,6 @@ class FileOperations_():
         self.frame.status['evento_acontecendo'] = False
 
 
-    def getfilename(self, filepath):
-        assert isinstance(self.logger_, FileLogger_)
-        try:
-            pathlist = filepath.split('\\')
-            filename = (pathlist[len(pathlist)-1]).lower()
-            return (filename)
-        except Exception as Err:
-            self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
-
-
-
-
 if __name__ == '__main__':
     import parse_config
     import wx
@@ -250,11 +258,9 @@ if __name__ == '__main__':
     '''Carregando informações do diretório raiz do projeto'''
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
-
     '''Carregando configurações...'''
     configuration = parse_config.ConfPacket()
     configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
-
      
     '''Variavel de status do sistema'''
     status = {
@@ -262,7 +268,6 @@ if __name__ == '__main__':
             'evento_acontecendo' : False,
             'updating_logs' : False
         }
-
 
     """Criando objeto de adição de registros de log"""
     logger_ = FileLogger_(pasta_de_logs='logs')
@@ -287,14 +292,16 @@ if __name__ == '__main__':
         metric= [0]
     )
 
-
     """Inicializando a interface gráfica"""
     app = wx.App()  
     frame = MyFrame(status=status, logger_=logger_, zabbix_instance= zsender, configs=configs)       # Janela principal
 
     fileoperations_ = FileOperations_(configs, frame, logger_)
-    fileoperations_.start_sync_thread()
+    fileoperations_.start_timesync_thread()
     while 1:
         pass
         time.sleep(1)
-        fileoperations_.checkDirectory()
+        fileoperations_.aguarda_liberar_arquivo('C:\\teste2\\doc.txt')
+        print(fileoperations_.aguarda_liberar_arquivo.__name__)
+
+      

@@ -16,7 +16,7 @@ class Event(LoggingEventHandler):
         
         self.my_logger.adiciona_linha_log(str(event))
         path_event = str(event.src_path)
-        filenamesize = (len(self.fileoperations.getfilename(path_event)))
+        filenamesize = len(os.path.basename(path_event))
         sliceposition = len(path_event)- (filenamesize)
         path_event_dir = os.path.join(path_event[0:sliceposition],'')
         for sync in self.configs['SYNC_FOLDERS']:

@@ -113,45 +113,72 @@ class MyFrame(wx.Frame):
         self.Show()
 
     def esconder_janela(self, event):
+
+        """Método que oculta a janela do programa para a bandeja do sistema"""
+
         self.Hide()
 
 
     def set_event_in_progress_led(self, event=None):
-        self.set_event_in_progress_led()
+
+        """Método que troca a cor do sinalizador de evento em curso para vermelho"""
+
+        self.led1.SetBackgroundColour('Red')
         self.Refresh()
 
 
     def set_event_waiting_led(self, event=None):
+
+        """Método que troca a cor do sinalizador de evento em curso para amarelo """
+
         self.led1.SetBackgroundColour('Yellow')
         self.Refresh()
 
 
     def clear_event_in_progress_led(self, event=None):
+
+        """Método que troca a cor do sinalizador de evento em curso para cinza"""
+
         self.led1.SetBackgroundColour('gray')
         self.Refresh()
 
 
     def set_sync_in_progress_led(self, event=None):
+
+        """Método que troca a cor do sinalizador de sincronismo em curso para vermelho"""
+
         self.led2.SetBackgroundColour('Red')
         self.Refresh()
 
 
     def set_sync_waiting_led(self, event=None):
+
+        """Método que troca a cor do sinalizador de sincronismo em curso para amarelo"""
+
         self.led2.SetBackgroundColour('Yellow')
         self.Refresh()
 
 
     def clear_sync_in_progress_led(self, event=None):
+
+        """Método que troca a cor do sinalizador de sincronismo em curso para cinza"""
+
         self.led2.SetBackgroundColour('gray')
         self.Refresh()
 
 
     def set_error_led(self, event=None):
+
+        """Método que troca a cor do sinalizador de erro ocorrido para vermelho"""
+
         self.led3.SetBackgroundColour('Red')
         self.Refresh()
 
 
     def clear_error_led(self, event=None):
+
+        """Método que troca a cor do sinalizador de erro ocorrido para cinza"""
+
         self.led3.SetBackgroundColour('gray')
         self.Refresh()
 
@@ -170,7 +197,7 @@ class MyFrame(wx.Frame):
         
         log_pathfile = os.path.join(ROOT_DIR, 'logs', logFilename)
         
-        if not os.path.exists(log_pathfile):            #retorna se o arquivo nao existir por alguma razão
+        if not os.path.exists(log_pathfile):            #sai da função se o arquivo nao existir por alguma razão
             self.status['updating_logs'] = False
             return
 
