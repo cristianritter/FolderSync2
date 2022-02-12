@@ -2,6 +2,8 @@ import wx
 import os
 from datetime import datetime
 import locale
+from FileLogger import FileLogger_
+from ZabbixSender import ZabbixSender_
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
@@ -28,7 +30,7 @@ wx.App.InitLocale = InitLocale   #substituindo metodo que estava gerando erro po
 
 
 class MyFrame(wx.Frame):    
-    def __init__(self, status, logger_, zabbix_instance, configs): 
+    def __init__(self, status, logger_: FileLogger_, zabbix_instance: ZabbixSender_, configs: str): 
         super().__init__(parent=None, style=wx.CAPTION, pos=(5, 5), size=(1080, 680))  
         self.SetIcon(wx.Icon(task_icon))
 
@@ -78,7 +80,7 @@ class MyFrame(wx.Frame):
 
         """Items Binds"""
         self.clear_btn.Bind(wx.EVT_LEFT_DOWN, self.clear_error_led)
-        self.cb1.Bind(wx.EVT_CHECKBOX, self.update_logs)
+        self.cb1.Bind(wx.EVT_CHECKBOX, self.filter_update)
         hide_button.Bind(wx.EVT_BUTTON, self.Hide)            
 
         """Organização dos items [containers]"""
@@ -182,16 +184,7 @@ class MyFrame(wx.Frame):
         self.led3.SetBackgroundColour('gray')
         self.Refresh()
 
-
-    def update_logs(self, event=None):
-
-        """Atualiza o painel de logs"""
-        
-        if self.status['updating_logs']:        # evita que duas atualizações se iniciem ao mesmo tempo
-            return
-        else:
-            self.status['updating_logs'] = True
-
+    def get_log_data_lines(self):
         dataPartialLogFname = datetime.now().strftime('_%Y%m')
         logFilename = f'log{dataPartialLogFname}.txt'
         
@@ -199,25 +192,45 @@ class MyFrame(wx.Frame):
         
         if not os.path.exists(log_pathfile):            #sai da função se o arquivo nao existir por alguma razão
             self.status['updating_logs'] = False
-            return
+            return 0
 
         with open(log_pathfile, "r") as file:
             linhas = file.readlines(20000000)
         
         linhas.reverse()        #reverse pois os logs mais antigos aparecem primeiro
-        
-        remover=[]              # rotina que atualiza informações do filtro
-        if (self.cb1.GetValue() == False):
-            for item in linhas:
-                if ('<' in item):
-                    remover.append(item)
-            for item in remover:
-                linhas.remove(item)
-        self.logpanel.SetValue(''.join(linhas))
+        return linhas
+
+    def filter_update(self, event=None):
+        if self.status['updating_logs']:        # evita que duas atualizações se iniciem ao mesmo tempo
+            return 0
+        else:
+            self.status['updating_logs'] = True
+
+        linhas = self.get_log_data_lines()
+        if (linhas):
+            remover=[]              # rotina que atualiza informações do filtro
+            if (self.cb1.GetValue() == False):
+                for item in linhas:
+                    if ('<' in item):
+                        remover.append(item)
+                for item in remover:
+                    linhas.remove(item)
+            self.logpanel.SetValue(''.join(linhas))
 
         self.status['updating_logs'] = False        # libera o sistema para uma nova atualização
 
-
+    def update_logs(self, event=None):
+        """Atualiza o painel de logs"""
+        
+        linhas = self.get_log_data_lines()
+        panel_text = self.logpanel.GetValue()
+        if linhas:
+            if "Ainda não existe" in panel_text:
+                self.logpanel.Clear()
+            for linha in linhas:
+                if linha not in panel_text:
+                    self.logpanel.AppendText(linha)
+      
 if __name__ == '__main__':
     
     import parse_config

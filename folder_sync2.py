@@ -4,9 +4,9 @@ import os
 import sys
 
 from taskbar_class import TaskBarIcon
+
 from frame_class import MyFrame
 from event_class import Event as MyEvent
-
 from ZabbixSender import ZabbixSender_
 from FileLogger import FileLogger_
 from FileOperations import FileOperations_
@@ -22,7 +22,7 @@ try:
 
     '''Carregando configurações...'''
     configuration = parse_config.ConfPacket()
-    configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
+    configs: str = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
 
 
     '''Variavel de status do sistema'''
@@ -103,7 +103,7 @@ try:
             logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             frame.set_error_led()
       
-except Exception as ERR:
+except Exception as Err:
     logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
 
 

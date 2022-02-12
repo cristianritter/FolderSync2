@@ -6,21 +6,10 @@ from threading import Thread
 from ZabbixSender import ZabbixSender_
 from FileLogger import FileLogger_
 from frame_class import MyFrame
-from functools import wraps
-
-'''def defineInstanceTypes(func):
-    @wraps(func)
-    def inner(self, *args):
-        print (args)
-        assert isinstance(self.frame, MyFrame)      # verifica erros na passagem de argumentos e permite o uso do recurso autocompletar
-        assert isinstance(self.logger_, FileLogger_)
-        assert isinstance(self.frame.zabbix_instance, ZabbixSender_)
-        func(self, *args)
-    return inner'''
 
 
 class FileOperations_():
-    def __init__(self, config_dict, frame_inst, logger_inst) -> None:
+    def __init__(self, config_dict: str, frame_inst: MyFrame, logger_inst: FileLogger_) -> bool:
         
         """Inicialização da classe"""
         
@@ -33,8 +22,6 @@ class FileOperations_():
         """Método que verifica se a criação do arquivo já foi finalizada antes de executar a cópia \n
         Retorna True se o arquivo estiver preso e não pode ser aberto por algum motivo desconhecido."""
    
-        assert isinstance(self.logger_, FileLogger_)
-
         time_begin = round(time.time())
         retorna_erro = False
         
@@ -61,9 +48,6 @@ class FileOperations_():
    
 
     def filetree(self, source, dest, sync_name):  
-
-        assert isinstance(self.frame, MyFrame)      # verifica erros na passagem de argumentos e permite o uso do recurso autocompletar
-        assert isinstance(self.logger_, FileLogger_)
 
         files_destination_md5=dict()
         files_source_md5=dict()
@@ -98,8 +82,8 @@ class FileOperations_():
                         os.remove(path_dest)
                         self.logger_.adiciona_linha_log("Removido: " + str(path_dest))
                         files_to_remove.append(file)
-                    except Exception as ERR:
-                        self.logger_.adiciona_linha_log("Erro ao remover arquivo." + str(ERR))
+                    except Exception as Err:
+                        self.logger_.adiciona_linha_log("Erro ao remover arquivo." + str(Err))
 
             debug = 'destination.pop'  
             for item in files_to_remove:
@@ -130,18 +114,13 @@ class FileOperations_():
             return 0
 
         except Exception as err:
-            assert isinstance(self.frame, MyFrame)      # verifica erros na passagem de argumentos e permite o uso do recurso autocompletar
-            assert isinstance(self.frame.zabbix_instance, ZabbixSender_)
             self.frame.zabbix_instance.metric[self.frame.zabbix_instance.idx] = str(source) 
             self.logger_.adiciona_linha_log(f' {err} {debug}')
             print  (f' {err} {debug}')
             return 1
 
     def sync_all_folders(self):
-        assert isinstance(self.frame, MyFrame)
-        assert isinstance(self.logger_, FileLogger_)
-        assert isinstance(self.frame.zabbix_instance, ZabbixSender_)
-
+  
         try:
             self.frame.update_logs()
             error_counter = 0
@@ -163,9 +142,7 @@ class FileOperations_():
 
 
     def syncs_thread(self):
-        assert isinstance(self.logger_, FileLogger_)
         try:
-            assert isinstance(self.frame, MyFrame)
             sleep_time = int(self.configs['SYNC_TIMES']['sync_with_no_events_time'])
             while sleep_time > 0:
                 self.frame.set_sync_waiting_led()
@@ -196,21 +173,17 @@ class FileOperations_():
 
         """Método reproduzido quando um evento é detectado em algum diretório monitorado"""
 
-        assert isinstance(self.frame, MyFrame)
-        assert isinstance(self.logger_, FileLogger_)
-        assert isinstance(self.frame.zabbix_instance, ZabbixSender_)
-
         self.frame.status['evento_acontecendo'] = True
         while self.frame.status['sincronizando'] == True:
             self.frame.set_event_waiting_led()
             time.sleep(0.1) 
         self.frame.set_event_in_progress_led()
         try: 
-            sync_ext = configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
+            sync_ext = str(configs['SYNC_EXTENSIONS'][sync_name]).lower().split(", ")
         except:
             sync_ext = []
         try:
-            filename = os.path.basename(filepath_source).lower()
+            filename = str(os.path.basename(filepath_source)).lower()
             filepath_dest = os.path.join(path_dest, filename)
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
                 if (os.path.splitext(filename)[1][1:].lower() in sync_ext) or (len(sync_ext) == 0):    
@@ -244,6 +217,7 @@ class FileOperations_():
                                 os.remove(filepath_dest)
                                 self.logger_.adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync' + str(filepath_source)) 
                                 self.frame.set_error_led()
+            self.frame.update_logs()
             self.frame.clear_event_in_progress_led()
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
