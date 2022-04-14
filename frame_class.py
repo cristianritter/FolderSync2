@@ -81,7 +81,7 @@ class MyFrame(wx.Frame):
         """Items Binds"""
         self.clear_btn.Bind(wx.EVT_LEFT_DOWN, self.clear_error_led)
         self.cb1.Bind(wx.EVT_CHECKBOX, self.filter_update)
-        hide_button.Bind(wx.EVT_BUTTON, self.Hide)            
+        hide_button.Bind(wx.EVT_BUTTON, self.esconder_janela)            
 
         """Organização dos items [containers]"""
         
