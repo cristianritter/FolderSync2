@@ -1,5 +1,5 @@
 import unittest
-from FileOperations import FileOperations_
+from LibFileOperations import FileOperations_
 
 #setup e teardown sao chamados respectivamente antes e depois de cada teste
 

@@ -16,15 +16,18 @@ class ZabbixSender_:
     metric - lista que traz os dados de metrica
 
     """
-    def __init__(self, metric_interval, hostname, key, server, port, idx, metric):
+    def __init__(self, metric_interval, hostname, key, server_ip, port, idx, metric):
         self.metric_interval = int(metric_interval)
         self.hostname = hostname
         self.key = key
-        self.server = server
+        self.server_ip = server_ip
         self.port = int(port)
         self.metric = metric
         self.idx = idx
-        
+        u = Thread(target=self.send_metric, args=[], daemon=True)
+        u.start()
+
+
     def send_metric(self):
         '''Rotina que continuamente envia as metricas               
         Recebe um array do tipo lista e utiliza os dados de indice da classe criada. Funcionam como ponteiro, \n
@@ -37,7 +40,7 @@ class ZabbixSender_:
                     packet = [
                         ZabbixMetric(self.hostname, self.key, str(self.metric[self.idx]))
                     ]
-                    ZabbixSender(zabbix_server=self.server, zabbix_port=self.port).send(packet)
+                    ZabbixSender(zabbix_server=self.server_ip, zabbix_port=self.port).send(packet)
                 except Exception as Err:
                     print(f"Falha de conexão com o Zabbix - {Err}")
         
@@ -45,15 +48,6 @@ class ZabbixSender_:
             print(f"Erro: {Err}")
             time.sleep(30)
 
-    def start_zabbix_thread(self):
-        """
-        Método que inicia um thread de envio de metricas para o zabbix
-        """
-        try:
-            u = Thread(target=self.send_metric, args=[], daemon=True)
-            u.start()
-        except Exception as Err:
-            print(f'Erro: {Err}')
 
 if __name__ == '__main__':
     """

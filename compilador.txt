@@ -1,1 +1,1 @@
-pyinstaller -D --onedir --ico=ico.ico --version-file=version.vfl --windowed --name=FolderSync2 WRMain.py
+pyinstaller -D --onedir --ico=ico.ico --version-file=version.vfl --windowed --name=FolderSync Main.py

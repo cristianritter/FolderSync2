@@ -1,0 +1,28 @@
+{
+    "trayicon_alias" : "CBN_FLO",
+    "check_all_files_interval" : 300,
+    "zabbix_key" : "status_foldersync_cbnflo",
+    "zabbix_instances" : {
+        "instance1" : {
+            "enabled" : 1,
+            "hostname" : "FLS - SERVER-RADIOS",
+            "server_ip" : "10.51.23.101",
+            "port" : 10051,
+            "send_metrics_interval" : 30
+        },
+        "instance2" : {
+            "enabled" : 1,
+            "hostname" : "FLS - SERVER-RADIOS",
+            "server_ip" : "10.51.23.103",
+            "port" : 10051,
+            "send_metrics_interval" : 30
+        }
+    },   
+    "folders_to_sync" : {
+        "sync450" : {
+            "origem" : "E:\\RadiosDados\\Atlantida\\Musicas",
+            "destino" : "E:\\RadiosDados\\Atlantida_Blumenau\\Musicas",
+            "sync_extensions" : ["mp3", "wav"]
+        }
+    }
+}

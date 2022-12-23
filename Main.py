@@ -3,13 +3,13 @@ import parse_config
 import os
 import sys
 
-from taskbar_class import TaskBarIcon
+from LibTaskbarClass import TaskBarIcon
 
-from frame_class import MyFrame
-from event_class import Event as MyEvent
-from ZabbixSender import ZabbixSender_
-from FileLogger import FileLogger_
-from FileOperations import FileOperations_
+from LibFrameClass import MyFrame
+from LibEventClass import Event as MyEvent
+from LibZabbixSender import ZabbixSender_
+from LibFileLogger import FileLogger_
+from LibFileOperations import FileOperations_
 
 from watchdog.observers import Observer
 import wx.adv
@@ -21,11 +21,13 @@ try:
     
 
     '''Carregando configurações...'''
-    configuration = parse_config.ConfPacket()
-    configs: str = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
+#    configuration = parse_config.ConfPacket()
+#    configs: str = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
+
+    configs = FileOperations_.read_json_from_file(None, "config.json")
 
 
-    '''Variavel de status do sistema'''
+    '''Variavel de status do sistema'''     # Evita que multiplos eventos ocorram ao mesmo tempo, causando falhas
     status = {
             'sincronizando' : False,
             'evento_acontecendo' : False,
@@ -33,31 +35,22 @@ try:
         }
 
 
-    '''Organizando parametros do zabbix'''
-    zabbix_param = {
-        'HOSTNAME' : configs['ZABBIX']['hostname'],
-        'SERVER' : configs['ZABBIX']['zabbix_server'],
-        'PORT' : int(configs['ZABBIX']['port']),
-        'KEY' : configs['ZABBIX']['key'],
-        'METRICS_INTERVAL' : int(configs['ZABBIX']['send_metrics_interval'])
-    }
-
+    """Criando instancias de envio de metricas para o zabbix"""
+    zabbix_metric = [0]
+    for instance in configs['zabbix_instances'].keys():
+        ZabbixSender_(
+            metric_interval= configs['zabbix_instances'][instance]['send_metrics_interval'], 
+            hostname= configs['zabbix_instances'][instance]['hostname'], 
+            key= configs['zabbix_key'], 
+            server_ip= configs['zabbix_instances'][instance]['server_ip'],
+            port= configs['zabbix_instances'][instance]['port'],
+            idx= 0,
+            metric= zabbix_metric
+        )
+    exit()
 
     """Criando objeto de adição de registros de log"""
     logger_ = FileLogger_(pasta_de_logs='logs')
-
-
-    """Criando objeto de envio de metricas para o zabbix"""
-    zsender = ZabbixSender_(
-        metric_interval= zabbix_param['METRICS_INTERVAL'], 
-        hostname= zabbix_param['HOSTNAME'], 
-        key= zabbix_param['KEY'], 
-        server= zabbix_param['SERVER'],
-        port= zabbix_param['PORT'],
-        idx= 0,
-        metric= [0]
-    )
-
 
     """Inicializando a interface gráfica"""
     app = wx.App()  
@@ -93,7 +86,7 @@ try:
             operations_.start_timesync_thread()
 
             """Start threading de envio de metricas para o zabbix"""
-            zsender.start_zabbix_thread()
+            #zsender.start_zabbix_thread()
 
             frame.update_logs()
 

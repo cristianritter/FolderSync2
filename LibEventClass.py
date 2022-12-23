@@ -1,6 +1,6 @@
 from watchdog.events import LoggingEventHandler
-from FileLogger import FileLogger_
-from FileOperations import FileOperations_
+from LibFileLogger import FileLogger_
+from LibFileOperations import FileOperations_
 import os
 
 class Event(LoggingEventHandler):

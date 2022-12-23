@@ -3,9 +3,10 @@ import shutil
 import os
 import sys
 from threading import Thread
-from ZabbixSender import ZabbixSender_
-from FileLogger import FileLogger_
-from frame_class import MyFrame
+from LibZabbixSender import ZabbixSender_
+from LibFileLogger import FileLogger_
+from LibFrameClass import MyFrame
+import json
 
 
 class FileOperations_():
@@ -17,6 +18,17 @@ class FileOperations_():
         self.frame = frame_inst
         self.logger_ = logger_inst
     
+    def read_json_from_file(self, filename):
+        """     Carrega o conteúdo de um arquivo no formato Json para um dicionário"""
+        try:
+            """Le dados do arquivo"""
+            with open(filename, 'r', encoding='utf-8') as infile:
+                data = json.load(infile)
+            return data
+        except Exception as Err:
+            print(Err, 'carregando aquivo')
+            return 0
+
     def aguarda_liberar_arquivo(self, filepath_source):
    
         """Método que verifica se a criação do arquivo já foi finalizada antes de executar a cópia \n

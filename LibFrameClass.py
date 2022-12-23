@@ -2,8 +2,8 @@ import wx
 import os
 from datetime import datetime
 import locale
-from FileLogger import FileLogger_
-from ZabbixSender import ZabbixSender_
+from LibFileLogger import FileLogger_
+from LibZabbixSender import ZabbixSender_
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
@@ -250,7 +250,7 @@ if __name__ == '__main__':
     }
     zabbix_metric = [0]
     
-    from FileLogger import FileLogger_
+    from LibFileLogger import FileLogger_
     logger_ = FileLogger_('logs')
     
     app = wx.App()  

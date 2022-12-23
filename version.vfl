@@ -16,12 +16,12 @@ VSVersionInfo(
         u'040904B0',
         [StringStruct(u'CompanyName', u'Cristian Ritter SW'),
         StringStruct(u'FileDescription', u'FolderSync'),
-        StringStruct(u'FileVersion', u'1.0 (win7sp1_rtm.101119-1850)'),
-        StringStruct(u'InternalName', u'FolderSync2'),
+        StringStruct(u'FileVersion', u'1.2 (win7sp1_rtm.101119-1850)'),
+        StringStruct(u'InternalName', u'FolderSync'),
         StringStruct(u'LegalCopyright', u'\xa9 CR Softwares. All rights reserved.'),
-        StringStruct(u'OriginalFilename', u'folder_sync2.exe'),
+        StringStruct(u'OriginalFilename', u'folder_sync.exe'),
         StringStruct(u'ProductName', u'FolderSync Sincronizer'),
-        StringStruct(u'ProductVersion', u'1.0')])
+        StringStruct(u'ProductVersion', u'1.2')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
   ]

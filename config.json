@@ -1,0 +1,31 @@
+{
+    "trayicon_alias" : "TESTE",
+    "check_all_files_interval" : 300,
+    "zabbix_key" : "status_foldersync",
+    "zabbix_instances" : {
+        "instance1" : {
+            "enabled" : 1,
+            "hostname" : "FLS - SERVER-RADIOS",
+            "server_ip" : "10.51.23.101",
+            "port" : 10051,
+            "send_metrics_interval" : 30
+        },
+        "instance2" : {
+            "enabled" : 1,
+            "hostname" : "FLS - SERVER-RADIOS",
+            "server_ip" : "10.51.23.103",
+            "port" : 10051,
+            "send_metrics_interval" : 30
+        }
+    },   
+    "folders_to_sync" : {
+        "sync_name" : {
+            "exemplo_origem" : "C:\\Teste",
+            "exemplo_destino_caminho_rede" : "\\\\10.146.25.11\\Teste",
+            "exemplo_sync_exten" : ["ext", "ext2", "..."],
+            "origem" : "C:\\Teste",
+            "destino" : "C:\\Teste2",
+            "sync_extensions" : ["txt", "mp3"]
+        }
+    }
+}
