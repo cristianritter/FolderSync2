@@ -30,15 +30,15 @@ wx.App.InitLocale = InitLocale   #substituindo metodo que estava gerando erro po
 
 
 class MyFrame(wx.Frame):    
-    def __init__(self, status, logger_: FileLogger_, zabbix_instance: ZabbixSender_, configs: str): 
+    def __init__(self, status, logger_: FileLogger_, zabbix_metric : list, configs: dict): 
         super().__init__(parent=None, style=wx.CAPTION, pos=(5, 5), size=(1080, 680))  
         self.SetIcon(wx.Icon(task_icon))
 
         self.configs = configs      
         self.status = status
         self.logger_ = logger_
-        self.zabbix_instance = zabbix_instance
-        self.Title = f"FolderSync by EngNSC - {self.configs['SYNC_NAME']['name']}"
+        self.zabbix_metric = zabbix_metric
+        self.Title = f"FolderSync by EngNSC - {self.configs['trayicon_alias']}"
 
         """Criação do painel"""
         panel = wx.Panel(self)
@@ -239,8 +239,8 @@ if __name__ == '__main__':
     
 
     '''Carregando configurações...'''
-    configuration = parse_config.ConfPacket()
-    configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
+#    configuration = parse_config.ConfPacket()
+#    configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
 
     
     status = {

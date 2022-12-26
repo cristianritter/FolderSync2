@@ -17,8 +17,11 @@ class Event(LoggingEventHandler):
         filenamesize = len(os.path.basename(path_event))
         sliceposition = len(path_event)- (filenamesize)
         path_event_dir = os.path.join(path_event[0:sliceposition],'')
-        for sync in self.configs['SYNC_FOLDERS']:
-            paths = self.configs['SYNC_FOLDERS'][sync].split(', ')
+        for sync in self.configs['folders_to_sync']:
+            paths = [0,0]
+            paths[0] = self.configs['folders_to_sync'][sync]['origem']
+            paths[1] = self.configs['folders_to_sync'][sync]['destino']
+            
             if os.path.join(paths[0], '') == path_event_dir:
                 self.fileoperations.event_operations(path_event, paths[1], sync, event)
     

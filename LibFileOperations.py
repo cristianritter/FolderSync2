@@ -10,7 +10,7 @@ import json
 
 
 class FileOperations_():
-    def __init__(self, config_dict: str, frame_inst: MyFrame, logger_inst: FileLogger_) -> bool:
+    def __init__(self, config_dict: dict, frame_inst: MyFrame, logger_inst: FileLogger_) -> bool:
         
         """Inicialização da classe"""
         
@@ -65,7 +65,7 @@ class FileOperations_():
         files_source_md5=dict()
 
         try: 
-            sync_ext = self.configs['SYNC_EXTENSIONS'][sync_name].lower().split(", ")
+            sync_ext : list = self.configs['folders_to_sync'][sync_name]['sync_extensions']
         except:
             sync_ext = []
 
@@ -73,7 +73,7 @@ class FileOperations_():
             debug = 'scan dest'
             for e in os.scandir(dest):
                 if e.is_file():
-                    if (not os.path.splitext(e.name)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
+                    if (not os.path.splitext(e.name)[1][1:].lower() in sync_ext.lower()) & (len(sync_ext) > 0):
                         continue
                     files_destination_md5[e.name.lower()]=e.stat().st_mtime
                 
@@ -136,9 +136,11 @@ class FileOperations_():
         try:
             self.frame.update_logs()
             error_counter = 0
-            for item in self.configs['SYNC_FOLDERS']:
+            for item in self.configs['folders_to_sync']:
                 time.sleep(0.1)
-                path = (self.configs['SYNC_FOLDERS'][item]).split(', ')
+                path = [0,0]
+                path[0] = self.configs['folders_to_sync'][item]['origem']  #diretorio de origem
+                path[1] = self.configs['folders_to_sync'][item]['destino'] # diretorio de destino
                 error_counter += self.filetree(path[0], path[1], item)
                 time.sleep(0.1)
             if error_counter == 0:
@@ -155,7 +157,7 @@ class FileOperations_():
 
     def syncs_thread(self):
         try:
-            sleep_time = int(self.configs['SYNC_TIMES']['sync_with_no_events_time'])
+            sleep_time = int(self.configs['check_all_files_interval'])
             while sleep_time > 0:
                 self.frame.set_sync_waiting_led()
                 self.frame.status['sincronizando'] = True
@@ -191,14 +193,14 @@ class FileOperations_():
             time.sleep(0.1) 
         self.frame.set_event_in_progress_led()
         try: 
-            sync_ext = str(configs['SYNC_EXTENSIONS'][sync_name]).lower().split(", ")
+            sync_ext = (self.configs['folders_to_sync'][sync_name]['sync_extensions'])
         except:
             sync_ext = []
         try:
             filename = str(os.path.basename(filepath_source)).lower()
             filepath_dest = os.path.join(path_dest, filename)
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
-                if (os.path.splitext(filename)[1][1:].lower() in sync_ext) or (len(sync_ext) == 0):    
+                if (os.path.splitext(filename)[1][1:].lower() in sync_ext.lower) or (len(sync_ext) == 0):    
                     if not os.path.exists(filepath_source):
                         try:
                             os.remove(filepath_dest)
@@ -238,15 +240,15 @@ class FileOperations_():
 
 
 if __name__ == '__main__':
-    import parse_config
+#    import parse_config
     import wx
 
     '''Carregando informações do diretório raiz do projeto'''
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
     '''Carregando configurações...'''
-    configuration = parse_config.ConfPacket()
-    configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
+#    configuration = parse_config.ConfPacket()
+#    configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
      
     '''Variavel de status do sistema'''
     status = {
@@ -259,35 +261,35 @@ if __name__ == '__main__':
     logger_ = FileLogger_(pasta_de_logs='logs')
 
     '''Organizando parametros do zabbix'''
-    zabbix_param = {
-        'HOSTNAME' : configs['ZABBIX']['hostname'],
-        'SERVER' : configs['ZABBIX']['zabbix_server'],
-        'PORT' : int(configs['ZABBIX']['port']),
-        'KEY' : configs['ZABBIX']['key'],
-        'METRICS_INTERVAL' : int(configs['ZABBIX']['send_metrics_interval'])
-    }
+#    zabbix_param = {
+#        'HOSTNAME' : configs['ZABBIX']['hostname'],
+#        'SERVER' : configs['ZABBIX']['zabbix_server'],
+#        'PORT' : int(configs['ZABBIX']['port']),
+#        'KEY' : configs['ZABBIX']['key'],
+#        'METRICS_INTERVAL' : int(configs['ZABBIX']['send_metrics_interval'])
+#    }
 
     """Criando objeto de envio de metricas para o zabbix"""
-    zsender = ZabbixSender_(
-        metric_interval= zabbix_param['METRICS_INTERVAL'], 
-        hostname= zabbix_param['HOSTNAME'], 
-        key= zabbix_param['KEY'], 
-        server= zabbix_param['SERVER'],
-        port= zabbix_param['PORT'],
-        idx= 0,
-        metric= [0]
-    )
+ #   zsender = ZabbixSender_(
+ #       metric_interval= zabbix_param['METRICS_INTERVAL'], 
+ #       hostname= zabbix_param['HOSTNAME'], 
+ #       key= zabbix_param['KEY'], 
+ #       server= zabbix_param['SERVER'],
+ #       port= zabbix_param['PORT'],
+ #       idx= 0,
+ #       metric= [0]
+ #   )
 
     """Inicializando a interface gráfica"""
-    app = wx.App()  
-    frame = MyFrame(status=status, logger_=logger_, zabbix_instance= zsender, configs=configs)       # Janela principal
+#    app = wx.App()  
+#    frame = MyFrame(status=status, logger_=logger_, zabbix_instance= zsender, configs=configs)       # Janela principal
 
-    fileoperations_ = FileOperations_(configs, frame, logger_)
-    fileoperations_.start_timesync_thread()
-    while 1:
-        pass
-        time.sleep(1)
-        fileoperations_.aguarda_liberar_arquivo('C:\\teste2\\doc.txt')
-        print(fileoperations_.aguarda_liberar_arquivo.__name__)
+#    fileoperations_ = FileOperations_(configs, frame, logger_)
+#    fileoperations_.start_timesync_thread()
+#    while 1:
+#        pass
+#        time.sleep(1)
+#        fileoperations_.aguarda_liberar_arquivo('C:\\teste2\\doc.txt')
+#        print(fileoperations_.aguarda_liberar_arquivo.__name__)
 
       

@@ -1,5 +1,5 @@
 import logging
-import parse_config
+#import parse_config
 import os
 import sys
 
@@ -47,32 +47,30 @@ try:
             idx= 0,
             metric= zabbix_metric
         )
-    exit()
 
     """Criando objeto de adição de registros de log"""
     logger_ = FileLogger_(pasta_de_logs='logs')
 
+    
     """Inicializando a interface gráfica"""
     app = wx.App()  
-    frame = MyFrame(status=status, logger_=logger_, zabbix_instance= zsender, configs=configs)       # Janela principal
-    TaskBarIcon(frame)      # Icone de bandeja
-
+    frame = MyFrame(status=status, logger_=logger_, zabbix_metric=zabbix_metric, configs=configs)       # Janela principal
+    TaskBarIcon(frame, configs)      # Icone de bandeja
 
     """Criando objeto de operacoes com arquivos"""
     operations_ = FileOperations_(configs, frame, logger_)
-
 
     '''Inicializando sistema de logging..'''
     logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S') 
     
-
     event_handler = MyEvent(mylogger=logger_, configs=configs, fileoperations=operations_)
 
 
     observer = Observer() 
     
+    exit()
                 
     if __name__ == "__main__":
         try:
