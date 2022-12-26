@@ -24,7 +24,7 @@ class FileLogger_:
             if not os.path.isdir(dir):
                 os.makedirs(dir)
         except Exception as Err:
-            self.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+            self.adiciona_linha_log(f'Erro ao verificar diretório em LibFileLogger.checkDirectory: {sys._getframe().f_code.co_name}, Descrição: {Err}')
 
 
     def adiciona_linha_log(self, *args):
@@ -50,7 +50,7 @@ class FileLogger_:
                 file.write(f'{LogDataContent}\n')
             
         except Exception as Err:
-            self.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+            self.adiciona_linha_log(f'Erro em adiciona linha de log: {sys._getframe().f_code.co_name}, Descrição: {Err}')
          
 
 if __name__ == '__main__':

@@ -26,7 +26,7 @@ class FileOperations_():
                 data = json.load(infile)
             return data
         except Exception as Err:
-            print(Err, 'carregando aquivo')
+            print(f'Erro carregando arquivo json. Filename: {filename}, Erro: {Err}')
             return 0
 
     def aguarda_liberar_arquivo(self, filepath_source):
@@ -171,7 +171,7 @@ class FileOperations_():
                 self.frame.clear_sync_in_progress_led()
                 time.sleep(sleep_time)
         except Exception as Err:
-            self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+            self.logger_.adiciona_linha_log(f'Erro em Fileoperations.syncs thread: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             self.frame.set_error_led()
         
 

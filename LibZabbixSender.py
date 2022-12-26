@@ -45,7 +45,7 @@ class ZabbixSender_:
                     print(f"Falha de conexão com o Zabbix - {Err}")
         
         except Exception as Err:
-            print(f"Erro: {Err}")
+            print(f"Erro na rotina de envio de metricas para o Zabbix, sendmetric. Erro: {Err}")
             time.sleep(30)
 
 

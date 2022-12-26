@@ -70,31 +70,27 @@ try:
 
     observer = Observer() 
     
-    exit()
-                
     if __name__ == "__main__":
         try:
-            for item in configs['SYNC_FOLDERS']:
-                monitored_folder = (configs['SYNC_FOLDERS'][item]).split(', ')           # lista com o diretorio monitorado e o diretório espelho 
-                observer.schedule(event_handler, monitored_folder[0], recursive=False)   # criação do mecanismo de monitoramento   
-            
+            for item in configs['folders_to_sync']:
+                monitored_folder = [0,0]
+                monitored_folder[0] = configs['folders_to_sync'][item]['origem']         # lista com o diretorio monitorado e o diretório espelho 
+                if os.path.isdir(monitored_folder[0]):
+                    observer.schedule(event_handler, monitored_folder[0], recursive=False)   # criação do mecanismo de monitoramento                
+                else:
+                    raise FileNotFoundError(f"{monitored_folder[0]} was not found or is a file")
             observer.start() 
-            
+   
             """Start threading de sincronismo de arquivos"""
             operations_.start_timesync_thread()
-
-            """Start threading de envio de metricas para o zabbix"""
-            #zsender.start_zabbix_thread()
 
             frame.update_logs()
 
             app.MainLoop()
 
         except Exception as Err:
-            logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+            logger_.adiciona_linha_log(f'Erro em Main observer start: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             frame.set_error_led()
       
 except Exception as Err:
     logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
-
-
