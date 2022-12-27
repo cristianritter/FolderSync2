@@ -9,14 +9,12 @@ import json
 
 class FileOperations_():
     def __init__(self, config_dict: dict, frame_inst: MyFrame, logger_inst: FileLogger_) -> bool:
-        
         """Inicialização da classe"""
-        
         self.configs = config_dict
         self.frame = frame_inst
         self.logger_ = logger_inst
     
-    def read_json_from_file(self, filename):
+    def read_json_from_file(self, filename):                # Carrega um arquivo json para a memória e retorna um dict
         """     Carrega o conteúdo de um arquivo no formato Json para um dicionário"""
         try:
             """Le dados do arquivo"""
@@ -28,105 +26,80 @@ class FileOperations_():
             return 0
 
     def aguarda_liberar_arquivo(self, filepath_source):
-   
         """Método que verifica se a criação do arquivo já foi finalizada antes de executar a cópia \n
         Retorna True se o arquivo estiver preso e não pode ser aberto por algum motivo desconhecido."""
-   
+        file_content = None
         time_begin = round(time.time())
-        retorna_erro = False
-        
-        in_file = None
         source_size1 = os.path.getsize( str(filepath_source) )
         source_size2 = os.path.getsize( str(filepath_source) )
-
-        while in_file == None or source_size1 != source_size2:
-            source_size1 = os.path.getsize( str(filepath_source) )
-            time.sleep(0.02)
-            source_size2 = os.path.getsize( str(filepath_source) )
-            
+        while file_content == None or source_size1 != source_size2:      # Compara o tamanho do arquivo de origem em dois instantes de tempo diferentes
+            source_size1 = os.path.getsize( str(filepath_source) )  # arquivos prontos para cópia devem manter o mesmo tamanho 
+            time.sleep(0.02)                                        # in file conterá o arquivo se estiver liberado para abertura
+            source_size2 = os.path.getsize( str(filepath_source) ) 
             try:
-                with open(filepath_source, "rb") as in_file: # opening for [r]eading as [b]inary
-                    time.sleep(0.02)
+                with open(filepath_source, "rb") as file_content:        # opening for [r]eading as [b]inary
+                    time.sleep(0.02)                                # se a abertura for possível sem falhas está pronto para a cópia
             except:
-                pass
-            
+                pass         
             if (round(time.time()) > ( time_begin + 20) ):
                 self.logger_.adiciona_linha_log("Arquivo protegido contra gravacao por mais de 20 segundos, não permitindo a cópia.")
-                retorna_erro = True
-                break
-        return retorna_erro
-   
+                return True
+        return False
 
-    def filetree(self, source, dest, sync_extensions):
+    def getfilelistbymodiftime(self, filespath, sync_extensions):
+        files_last_modif_dict = {}
+        for e in os.scandir(filespath):          # scanner do diretório
+            if e.is_file():                 # para cada arquivo encontrado:
+                if (not os.path.splitext(e.name)[1][1:].lower() in ' '.join(sync_extensions).lower()) & (len(sync_extensions) > 0):
+                    continue                # ignora o arquivo se não estiver na lista de extensões a serem trabalhadas
+                files_last_modif_dict[e.name.lower()]=e.stat().st_mtime       # verifica a data de modificacao do arquivo
+        return files_last_modif_dict
+
+    def folder_mirror(self, source, dest, sync_extensions):
         """Sincroniza dois diretório, copiando e/ou excluindo arquivos conforme a necessidade"""  
-
-        files_destination_md5=dict()
-        files_source_md5=dict()
-
+        destfile_lastmodif_dict=dict()                # Contém a lista de arquivos da pasta de destino. ->    Key=filename, value=timeoflastmodification
+        sourcefile_lastmodif_dict=dict()                     # Contém a lista de arquivos da pasta de origem.  ->    Key=filename, value=timeoflastmodification
         try:
-            debug = 'scan dest'
-            for e in os.scandir(dest):
-                if e.is_file():
-                    if (not os.path.splitext(e.name)[1][1:].lower() in ' '.join(sync_extensions).lower()) & (len(sync_extensions) > 0):
-                        continue
-                    files_destination_md5[e.name.lower()]=e.stat().st_mtime
+            debug = 'scan source and dest folders'             # identificação do ponto de execução para verificação de falhas
+            destfile_lastmodif_dict = self.getfilelistbymodiftime(source, sync_extensions)
+            sourcefile_lastmodif_dict = self.getfilelistbymodiftime(dest, sync_extensions)
                 
-            debug = 'scan source'
-            for e in os.scandir(source):
-                if e.is_file():
-                    if (not os.path.splitext(e.name)[1][1:].lower() in ' '.join(sync_extensions).lower()) & (len(sync_extensions) > 0):
-                        continue
-                    files_source_md5[e.name.lower()]=e.stat().st_mtime
-                
-            files_to_remove=[]
-
             debug = 'remove files'
-            for file in files_destination_md5:
+            for file in destfile_lastmodif_dict:
                 path_dest = os.path.join(dest, file)
-                if file not in files_source_md5:
+                if file not in sourcefile_lastmodif_dict:       # Verifica se arquivos existentes na pasta de destino existem na pasta de origem
                     try:
-                        os.remove(path_dest)
-                        self.logger_.adiciona_linha_log("Removido: " + str(path_dest))
-                        files_to_remove.append(file)
+                        os.remove(path_dest)                    # Remove os arquivos que não existem na pasta de origem
+                        destfile_lastmodif_dict.pop(file)       # Remove arquivos apagados da lista de arquivos existentes
+                        self.logger_.adiciona_linha_log(f"Removido: {path_dest}")
                     except Exception as Err:
-                        self.logger_.adiciona_linha_log("Erro ao remover arquivo." + str(Err))
-
-            debug = 'destination.pop'  
-            for item in files_to_remove:
-                files_destination_md5.pop(item)
+                        self.logger_.adiciona_linha_log(f"Erro ao remover arquivo. Erro: {Err} Debug: {debug}")
 
             debug = 'copy files'
             thistime=round(time.time())
-            for file in files_source_md5:
+            for file in sourcefile_lastmodif_dict:
                 path_source = os.path.join(source, file)
                 path_dest = os.path.join(dest, file)
-                if file not in files_destination_md5:
-                    
-                    if self.aguarda_liberar_arquivo(path_source):
+                                                                # Se o arquivo não estiver na lista de destino ou tiver tamanho diferente:
+                if file not in destfile_lastmodif_dict or sourcefile_lastmodif_dict[file] != destfile_lastmodif_dict[file]:    
+                    if self.aguarda_liberar_arquivo(path_source):       # Se o arquivo estiver preso e a cópia for impedida retorna erro 1
                         return 1
-                    
-                    shutil.copy2(path_source, path_dest)                
-                    self.logger_.adiciona_linha_log("Copiado: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize(str(path_dest) )) + "]")
-                else:            
-                    if files_source_md5[file] != files_destination_md5[file]:
+                    shutil.copy2(path_source, path_dest)                # Copia o arquivo              
+                    if file not in destfile_lastmodif_dict:     # Se arquivo não existia adiciona informação de cópia
+                        self.logger_.adiciona_linha_log(f"Copiado: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")
+                    else:                                       # Se existia adiciona informação de sobrescrita
+                        self.logger_.adiciona_linha_log(f"Sobrescrito: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")
                         
-                        if self.aguarda_liberar_arquivo(path_source):
-                            return 1
-                        
-                        shutil.copy2(path_source, path_dest)
-                        self.logger_.adiciona_linha_log("Sobrescrito: " + str(path_source) + "[" + str(os.path.getsize( str(path_source) )) + "]" + " to " + str(path_dest) + "[" + str(os.path.getsize( str(path_dest) )) + "]")
-                if (round(time.time()) > ( thistime + 120) ):
-                    return 0   
+                if (round(time.time()) > ( thistime + 120) ):               # Passa para o próximo diretório caso a rotina passe de 2 minutos nesta pasta
+                    return 0                                                # Retorna automaticamente no próximo ciclo
             return 0
 
         except Exception as err:
             self.frame.zabbix_metric[0] = str(source) 
             self.logger_.adiciona_linha_log(f' {err} {debug}')
-            print  (f' {err} {debug}')
             return 1
 
     def sync_all_folders(self):
-  
         try:
             self.frame.update_logs()
             error_counter = 0
@@ -140,7 +113,7 @@ class FileOperations_():
                 except:
                     sync_ext = []
 
-                error_counter += self.filetree(path[0], path[1], sync_ext)          #sincroniza um diretório e retorna se houve erros
+                error_counter += self.folder_mirror(path[0], path[1], sync_ext)          #sincroniza um diretório e retorna se houve erros
                 time.sleep(0.1)
             if error_counter == 0:
                 self.frame.zabbix_metric[0] = 0

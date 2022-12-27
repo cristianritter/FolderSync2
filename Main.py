@@ -36,7 +36,7 @@ if os.path.isfile('config.json'):
     configs = FileOperations_.read_json_from_file(None, "config.json")
 else:
     logger_.adiciona_linha_log(f" Configuration file 'Config.json' was not found.")
-    raise FileNotFoundError(f" Configuration file 'Config.json' was not found.")
+    raise FileNotFoundError(f" Configuration file 'config.json' was not found.")
 
 """Criando instancias de envio de metricas para o zabbix"""
 try:
@@ -51,7 +51,7 @@ try:
             metric= zabbix_metric
         )
 except Exception as Err:
-    logger_.adiciona_linha_log(f"Erro: {Err} - Configuration file 'Config.json' can be wrong at Zabbix description.")
+    logger_.adiciona_linha_log(f"Erro: {Err} - Configuration file 'config.json' can be wrong at Zabbix description.")
   
 """Inicializando a interface gráfica"""
 try:
