@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 import locale
 from LibFileLogger import FileLogger_
-from LibZabbixSender import ZabbixSender_
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
@@ -213,7 +212,6 @@ class MyFrame(wx.Frame):
 
     def update_logs(self, event=None):
         """Atualiza o painel de logs"""
-        
         linhas = self.get_log_data_lines()
         panel_text = self.logpanel.GetValue()
         if linhas:

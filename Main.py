@@ -1,4 +1,3 @@
-#import logging
 import os
 import sys
 from threading import Thread
@@ -19,14 +18,10 @@ status = {                              # Evita que multiplos eventos ocorram ao
         'updating_logs' : False
     }
 zabbix_metric = [0]                      #Variavel que carrega as metricas do zabbix
+frame : MyFrame = None
 
 """Criando objeto de adição de registros de log"""
-logger_ = FileLogger_(pasta_de_logs='logs')
-
-#'''Inicializando sistema de logging..'''
-#logging.basicConfig(level=logging.INFO,
-#                    format='%(asctime)s - %(message)s',
-#                    datefmt='%Y-%m-%d %H:%M:%S') 
+logger_ = FileLogger_(frame, pasta_de_logs='logs')
 
 '''Carregando informações do diretório raiz do projeto'''
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
@@ -71,32 +66,32 @@ try:
 except Exception as Err:
     logger_.adiciona_linha_log(f"Erro: {Err} - Erro ao criar estrutura de eventhandler and observer.")
 
+"""Cadastro de itens no observer que monitora mudanças nos diretórios"""
+for item in configs['folders_to_sync']:
+    observed_folder = configs['folders_to_sync'][item]['origem']         # lista com o diretorio monitorado e o diretório espelho 
+    if os.path.isdir(observed_folder):
+        observer.schedule(event_handler, observed_folder, recursive=False)   # criação do mecanismo de monitoramento                
+    else:
+        raise FileNotFoundError(f"{observed_folder} was not found or is a file")
+
 def main():
-    try:
-        """Cadastro de itens no observer que monitora mudanças nos diretórios"""
-        for item in configs['folders_to_sync']:
-            observed_folder = configs['folders_to_sync'][item]['origem']         # lista com o diretorio monitorado e o diretório espelho 
-            if os.path.isdir(observed_folder):
-                observer.schedule(event_handler, observed_folder, recursive=False)   # criação do mecanismo de monitoramento                
-            else:
-                raise FileNotFoundError(f"{observed_folder} was not found or is a file")
-        
+    try:  
         """Inicialização do serviço de observação de diretórios"""
         observer.start() 
 
         """Start threading de sincronismo de arquivos"""
-        u = Thread(target=operations_.syncs_thread, args=[], daemon=True)   # Rotina que sincroniza todos os diretórios em intervalos regulares
+        u = Thread(target=operations_.timed_sync_looping, args=[], daemon=True)   # Rotina que sincroniza todos os diretórios em intervalos regulares
         u.start()
         
-        """Start threading de sincronismo de arquivos"""
-        frame.update_logs()                 # Adiciona as linhas ao painel de logs quando o programa é recém aberto
+        """Update panel with past log information on startup"""
+        frame.update_logs()                
         
         """Loop principal da execução da interface gráfica"""
         app.MainLoop()
 
     except Exception as Err:
         logger_.adiciona_linha_log(f'Erro em Main observer start: {sys._getframe().f_code.co_name}, Descrição: {Err}')
-        frame.set_error_led()
+        exit()          # Saída do aplicativo em caso de problemas na inicialização dos serviços
 
 if __name__ == "__main__":
     main()

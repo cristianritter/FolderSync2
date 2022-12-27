@@ -1,6 +1,8 @@
 from datetime import datetime
 import os
 import sys
+#if not "MyFrame" in sys.modules:
+#    from LibFrameClass import MyFrame
 
 
 class FileLogger_:
@@ -9,12 +11,12 @@ class FileLogger_:
     essa pasta será criada dentro do diretorio raiz do programa."""  
 
 
-    def __init__(self, pasta_de_logs):
+    def __init__(self, frame, pasta_de_logs):
         
         '''Inicialização da classe FileLogger'''
         
         self.LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), pasta_de_logs) 
-
+        self.frame = frame
 
     def checkDirectory(self, dir=None):
         
@@ -49,9 +51,13 @@ class FileLogger_:
             with open(os.path.join(self.LOGS_DIR, logFilename), "a") as file:
                 file.write(f'{LogDataContent}\n')
             
-        except Exception as Err:
-            self.adiciona_linha_log(f'Erro em adiciona linha de log: {sys._getframe().f_code.co_name}, Descrição: {Err}')
-         
+        except Exception:
+            pass
+        try:
+            self.frame.update_logs()                # Este try é necessário caso ocorram eventos antes da criação da intancia frame.update_logs.
+        except:
+            pass
+
 
 if __name__ == '__main__':
     Logger = FileLogger_(pasta_de_logs='logs')

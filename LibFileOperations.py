@@ -52,18 +52,17 @@ class FileOperations_():
             if e.is_file():                 # para cada arquivo encontrado:
                 if (not os.path.splitext(e.name)[1][1:].lower() in ' '.join(sync_extensions).lower()) & (len(sync_extensions) > 0):
                     continue                # ignora o arquivo se não estiver na lista de extensões a serem trabalhadas
-                files_last_modif_dict[e.name.lower()]=e.stat().st_mtime       # verifica a data de modificacao do arquivo
+                files_last_modif_dict[e.name.lower()]=e.stat().st_mtime       # verifica a data de modificacao do arquivo e adiciona a lista
         return files_last_modif_dict
 
     def folder_mirror(self, source, dest, sync_extensions):
-        """Sincroniza dois diretório, copiando e/ou excluindo arquivos conforme a necessidade"""  
+        """Sincroniza dois diretórios, copiando e/ou excluindo arquivos conforme a necessidade"""  
         destfile_lastmodif_dict=dict()                # Contém a lista de arquivos da pasta de destino. ->    Key=filename, value=timeoflastmodification
         sourcefile_lastmodif_dict=dict()                     # Contém a lista de arquivos da pasta de origem.  ->    Key=filename, value=timeoflastmodification
         try:
             debug = 'scan source and dest folders'             # identificação do ponto de execução para verificação de falhas
             destfile_lastmodif_dict = self.getfilelistbymodiftime(source, sync_extensions)
-            sourcefile_lastmodif_dict = self.getfilelistbymodiftime(dest, sync_extensions)
-                
+            sourcefile_lastmodif_dict = self.getfilelistbymodiftime(dest, sync_extensions)       
             debug = 'remove files'
             for file in destfile_lastmodif_dict:
                 path_dest = os.path.join(dest, file)
@@ -74,7 +73,6 @@ class FileOperations_():
                         self.logger_.adiciona_linha_log(f"Removido: {path_dest}")
                     except Exception as Err:
                         self.logger_.adiciona_linha_log(f"Erro ao remover arquivo. Erro: {Err} Debug: {debug}")
-
             debug = 'copy files'
             thistime=round(time.time())
             for file in sourcefile_lastmodif_dict:
@@ -88,59 +86,51 @@ class FileOperations_():
                     if file not in destfile_lastmodif_dict:     # Se arquivo não existia adiciona informação de cópia
                         self.logger_.adiciona_linha_log(f"Copiado: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")
                     else:                                       # Se existia adiciona informação de sobrescrita
-                        self.logger_.adiciona_linha_log(f"Sobrescrito: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")
-                        
+                        self.logger_.adiciona_linha_log(f"Sobrescrito: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")         
                 if (round(time.time()) > ( thistime + 120) ):               # Passa para o próximo diretório caso a rotina passe de 2 minutos nesta pasta
                     return 0                                                # Retorna automaticamente no próximo ciclo
             return 0
-
         except Exception as err:
-            self.frame.zabbix_metric[0] = str(source) 
-            self.logger_.adiciona_linha_log(f' {err} {debug}')
+            self.logger_.adiciona_linha_log(f'Problema durante a rotina de folder_mirror. Erro:{err} debug:{debug}')
             return 1
 
-    def sync_all_folders(self):
+    def timed_sync_looping(self):
         try:
-            self.frame.update_logs()
-            error_counter = 0
-            for item in self.configs['folders_to_sync']:
-                time.sleep(0.1)
-                path = [0,0]
-                path[0] = self.configs['folders_to_sync'][item]['origem']  #diretorio de origem
-                path[1] = self.configs['folders_to_sync'][item]['destino'] # diretorio de destino
-                try: 
-                   sync_ext : list = self.configs['folders_to_sync'][item]['sync_extensions']
-                except:
-                    sync_ext = []
-
-                error_counter += self.folder_mirror(path[0], path[1], sync_ext)          #sincroniza um diretório e retorna se houve erros
-                time.sleep(0.1)
-            if error_counter == 0:
-                self.frame.zabbix_metric[0] = 0
-                self.frame.clear_error_led()
-            else:
-                self.frame.zabbix_metric[0] = 1
-                self.frame.set_error_led()
-
-        except Exception as Err:
-            self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
-            self.frame.set_error_led()
-
-
-    def syncs_thread(self):
-        try:
-            sleep_time = int(self.configs['check_all_files_interval'])
-            while sleep_time > 0:
+            while True:
                 self.frame.set_sync_waiting_led()
                 self.frame.status['sincronizando'] = True
                 if self.frame.status['evento_acontecendo']:
                     self.frame.status['sincronizando'] = False
                     time.sleep(1)
                     continue
-                self.frame.set_sync_in_progress_led()
-                self.sync_all_folders()                                 #realiza rotina de sincronizar todos os diretorios
+                self.frame.set_sync_in_progress_led()  
+                try:
+                    error_counter = 0
+                    for item in self.configs['folders_to_sync']:
+                        time.sleep(0.1)
+                        origin_path = self.configs['folders_to_sync'][item]['origem']  #diretorio de origem
+                        dest_path = self.configs['folders_to_sync'][item]['destino'] # diretorio de destino
+                        try: 
+                            sync_ext : list = self.configs['folders_to_sync'][item]['sync_extensions']
+                        except:
+                            sync_ext = []
+                        error_counter += self.folder_mirror(origin_path, dest_path, sync_ext)          # error_counter soma 1 para cada evento de erro durante o sincronismo
+                        time.sleep(0.1)
+                    if error_counter == 0:
+                        self.frame.zabbix_metric[0] = 0
+                        self.frame.clear_error_led()
+                    else:
+                        self.logger_.adiciona_linha_log(f'Erro durante a sincronização de {error_counter} diretório(s).')
+                        self.frame.zabbix_metric[0] = 1
+                        self.frame.set_error_led()
+                except Exception as Err:
+                    self.logger_.adiciona_linha_log(f'Erro em sync_all_folders: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+                    self.frame.zabbix_metric[0] = 1
+                    self.frame.set_error_led()               
+
                 self.frame.status['sincronizando'] = False
                 self.frame.clear_sync_in_progress_led()
+                sleep_time = int(self.configs['check_all_files_interval'])
                 time.sleep(sleep_time)
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'Erro em Fileoperations.syncs thread: {sys._getframe().f_code.co_name}, Descrição: {Err}')
@@ -148,7 +138,6 @@ class FileOperations_():
 
     def event_operations(self, filepath_source, path_dest, sync_name, event):
         """Método reproduzido quando um evento é detectado em algum diretório monitorado"""
-
         self.frame.status['evento_acontecendo'] = True
         while self.frame.status['sincronizando'] == True:
             self.frame.set_event_waiting_led()
@@ -162,15 +151,17 @@ class FileOperations_():
             filename = str(os.path.basename(filepath_source)).lower()
             filepath_dest = os.path.join(path_dest, filename)
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
-                if (os.path.splitext(filename)[1][1:].lower() in ' '.join(sync_ext).lower() or len(sync_ext) == 0):    
-                    if not os.path.exists(filepath_source):
+                if (os.path.splitext(filename)[1][1:].lower() in ' '.join(sync_ext).lower() or len(sync_ext) == 0):  # Se a extensao do arquivo estiver entre as sincronizadas  
+                    """Remoção de arquivos"""
+                    if not os.path.exists(filepath_source):         # Se o arquivo não existe na origem, apaga no destino
                         try:
                             os.remove(filepath_dest)
                             self.logger_.adiciona_linha_log("Removido: " + str(filepath_dest))
                         except Exception as err:
                             self.logger_.adiciona_linha_log(str(err) + "Erro ao remover arquivo. " + str(filepath_dest))
                             self.frame.set_error_led()       
-                    elif not os.path.exists(filepath_dest):
+                        """Cópia de arquivos"""
+                    elif not os.path.exists(filepath_dest):         # Se o arquivo não existe no destino, copia para o destino
                         self.aguarda_liberar_arquivo(filepath_source)
                         shutil.copy2(filepath_source, filepath_dest)
                         origem_size = os.path.getsize( str(filepath_source) )
@@ -193,7 +184,6 @@ class FileOperations_():
                                 os.remove(filepath_dest)
                                 self.logger_.adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync' + str(filepath_source)) 
                                 self.frame.set_error_led()
-            self.frame.update_logs()
             self.frame.clear_event_in_progress_led()
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
