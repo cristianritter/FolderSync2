@@ -138,6 +138,7 @@ class FileOperations_():
                 time.sleep(sleep_time)
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'Erro em Fileoperations.syncs thread: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+            self.frame.zabbix_metric[0] = 1
             self.frame.set_error_led()
 
     def event_operations(self, filepath_source, path_dest, sync_name, event):
@@ -169,22 +170,15 @@ class FileOperations_():
                     elif not os.path.exists(filepath_dest):         # Se o arquivo não existe no destino, copia para o destino
                         self.aguarda_liberar_arquivo(filepath_source)
                         shutil.copy2(filepath_source, filepath_dest)
-                        origem_size = os.path.getsize( str(filepath_source) )
-                        destino_size = os.path.getsize( str(filepath_dest) )
-                        self.logger_.adiciona_linha_log(f"Copiado: {filepath_source} [{origem_size} bytes] to {filepath_dest} [{destino_size} bytes]")  
-                        if (origem_size != destino_size):
-                            os.remove(filepath_dest)
-                            self.logger_.adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync.' + str(filepath_source))
-                            self.frame.zabbix_metric[0] = 1
-                            self.frame.set_error_led()
-                    else:
+                        self.logger_.adiciona_linha_log(f"Copiado: {filepath_source} [{os.path.getsize(str(filepath_source))} bytes] to {filepath_dest} [{os.path.getsize(str(filepath_dest))} bytes]")  
+                    else:                                           # Se data de modificação ou tamanhos diferentes:
+                        origem_size = os.path.getsize(str(filepath_source))
+                        destino_size = os.path.getsize(str(filepath_dest))
                         source_mtime = os.stat(filepath_source).st_mtime
                         dest_mtime = os.stat(filepath_dest).st_mtime
-                        if source_mtime != dest_mtime:
+                        if source_mtime != dest_mtime or origem_size != destino_size:
                             self.aguarda_liberar_arquivo(filepath_source)
                             shutil.copy2(filepath_source, filepath_dest)
-                            origem_size = os.path.getsize( str(filepath_source) )
-                            destino_size = os.path.getsize( str(filepath_dest) )
                             self.logger_.adiciona_linha_log(f"Sobrescrito: {filepath_source} [{origem_size} bytes] to {filepath_dest} [{destino_size} bytes]")
                             if (origem_size != destino_size):
                                 os.remove(filepath_dest)
