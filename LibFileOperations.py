@@ -2,8 +2,6 @@ import time
 import shutil
 import os
 import sys
-from threading import Thread
-from LibZabbixSender import ZabbixSender_
 from LibFileLogger import FileLogger_
 from LibFrameClass import MyFrame
 import json
@@ -59,28 +57,24 @@ class FileOperations_():
         return retorna_erro
    
 
-    def filetree(self, source, dest, sync_name):  
+    def filetree(self, source, dest, sync_extensions):
+        """Sincroniza dois diretório, copiando e/ou excluindo arquivos conforme a necessidade"""  
 
         files_destination_md5=dict()
         files_source_md5=dict()
-
-        try: 
-            sync_ext : list = self.configs['folders_to_sync'][sync_name]['sync_extensions']
-        except:
-            sync_ext = []
 
         try:
             debug = 'scan dest'
             for e in os.scandir(dest):
                 if e.is_file():
-                    if (not os.path.splitext(e.name)[1][1:].lower() in sync_ext.lower()) & (len(sync_ext) > 0):
+                    if (not os.path.splitext(e.name)[1][1:].lower() in ' '.join(sync_extensions).lower()) & (len(sync_extensions) > 0):
                         continue
                     files_destination_md5[e.name.lower()]=e.stat().st_mtime
                 
             debug = 'scan source'
             for e in os.scandir(source):
                 if e.is_file():
-                    if (not os.path.splitext(e.name)[1][1:].lower() in sync_ext) & (len(sync_ext) > 0):
+                    if (not os.path.splitext(e.name)[1][1:].lower() in ' '.join(sync_extensions).lower()) & (len(sync_extensions) > 0):
                         continue
                     files_source_md5[e.name.lower()]=e.stat().st_mtime
                 
@@ -126,7 +120,7 @@ class FileOperations_():
             return 0
 
         except Exception as err:
-            self.frame.zabbix_instance.metric[self.frame.zabbix_instance.idx] = str(source) 
+            self.frame.zabbix_metric[0] = str(source) 
             self.logger_.adiciona_linha_log(f' {err} {debug}')
             print  (f' {err} {debug}')
             return 1
@@ -141,13 +135,18 @@ class FileOperations_():
                 path = [0,0]
                 path[0] = self.configs['folders_to_sync'][item]['origem']  #diretorio de origem
                 path[1] = self.configs['folders_to_sync'][item]['destino'] # diretorio de destino
-                error_counter += self.filetree(path[0], path[1], item)
+                try: 
+                   sync_ext : list = self.configs['folders_to_sync'][item]['sync_extensions']
+                except:
+                    sync_ext = []
+
+                error_counter += self.filetree(path[0], path[1], sync_ext)          #sincroniza um diretório e retorna se houve erros
                 time.sleep(0.1)
             if error_counter == 0:
-                self.frame.zabbix_instance.metric[self.frame.zabbix_instance.idx] = 0
+                self.frame.zabbix_metric[0] = 0
                 self.frame.clear_error_led()
             else:
-                self.frame.zabbix_instance.metric[self.frame.zabbix_instance.idx] = 1
+                self.frame.zabbix_metric[0] = 1
                 self.frame.set_error_led()
 
         except Exception as Err:
@@ -173,18 +172,8 @@ class FileOperations_():
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'Erro em Fileoperations.syncs thread: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             self.frame.set_error_led()
-        
-
-    def start_timesync_thread(self):
-        
-        """        Método que inicia um thread de envio de metricas para o zabbix"""
-
-        u = Thread(target=self.syncs_thread, args=[], daemon=True)
-        u.start()
-    
 
     def event_operations(self, filepath_source, path_dest, sync_name, event):
-
         """Método reproduzido quando um evento é detectado em algum diretório monitorado"""
 
         self.frame.status['evento_acontecendo'] = True
@@ -193,14 +182,14 @@ class FileOperations_():
             time.sleep(0.1) 
         self.frame.set_event_in_progress_led()
         try: 
-            sync_ext = (self.configs['folders_to_sync'][sync_name]['sync_extensions'])
+            sync_ext = self.configs['folders_to_sync'][sync_name]['sync_extensions']
         except:
             sync_ext = []
         try:
             filename = str(os.path.basename(filepath_source)).lower()
             filepath_dest = os.path.join(path_dest, filename)
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
-                if (os.path.splitext(filename)[1][1:].lower() in sync_ext.lower) or (len(sync_ext) == 0):    
+                if (os.path.splitext(filename)[1][1:].lower() in ' '.join(sync_ext).lower() or len(sync_ext) == 0):    
                     if not os.path.exists(filepath_source):
                         try:
                             os.remove(filepath_dest)
@@ -235,20 +224,17 @@ class FileOperations_():
             self.frame.clear_event_in_progress_led()
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
-            self.frame.zabbix_instance.metric = 1
+            self.frame.zabbix_metric = 1
         self.frame.status['evento_acontecendo'] = False
 
 
 if __name__ == '__main__':
-#    import parse_config
     import wx
 
     '''Carregando informações do diretório raiz do projeto'''
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
     '''Carregando configurações...'''
-#    configuration = parse_config.ConfPacket()
-#    configs = configuration.load_config('SYNC_FOLDERS, SYNC_TIMES, SYNC_EXTENSIONS, ZABBIX, SYNC_NAME')
      
     '''Variavel de status do sistema'''
     status = {

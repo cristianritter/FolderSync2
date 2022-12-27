@@ -11,7 +11,6 @@ class Event(LoggingEventHandler):
         self.fileoperations = fileoperations
 
     def dispatch(self, event):
-        
         self.my_logger.adiciona_linha_log(str(event))
         path_event = str(event.src_path)
         filenamesize = len(os.path.basename(path_event))

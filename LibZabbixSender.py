@@ -2,7 +2,6 @@ from pyzabbix import ZabbixMetric, ZabbixSender
 import time
 from threading import Thread
 
-
 class ZabbixSender_:
     """
     Classe que implementa o sistema de envio de metricas para o Zabbix \n
