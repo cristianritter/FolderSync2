@@ -97,13 +97,13 @@ class FileOperations_():
     def timed_sync_looping(self):
         try:
             while True:
-                self.frame.set_sync_waiting_led()
+                self.frame.set_led2_orange()
                 self.frame.status['sincronizando'] = True
                 if self.frame.status['evento_acontecendo']:
                     self.frame.status['sincronizando'] = False
                     time.sleep(1)
                     continue
-                self.frame.set_sync_in_progress_led()  
+                self.frame.set_led2_red()  
                 try:
                     error_counter = 0
                     for item in self.configs['folders_to_sync']:
@@ -129,7 +129,8 @@ class FileOperations_():
                     self.frame.set_error_led()               
 
                 self.frame.status['sincronizando'] = False
-                self.frame.clear_sync_in_progress_led()
+                self.frame.set_led2_cinza()
+                self.frame.panel_update()
                 sleep_time = int(self.configs['check_all_files_interval'])
                 time.sleep(sleep_time)
         except Exception as Err:
@@ -139,10 +140,10 @@ class FileOperations_():
     def event_operations(self, filepath_source, path_dest, sync_name, event):
         """Método reproduzido quando um evento é detectado em algum diretório monitorado"""
         self.frame.status['evento_acontecendo'] = True
+        self.frame.set_led1_orange()
         while self.frame.status['sincronizando'] == True:
-            self.frame.set_event_waiting_led()
             time.sleep(0.1) 
-        self.frame.set_event_in_progress_led()
+        self.frame.set_led1_red()
         try: 
             sync_ext = self.configs['folders_to_sync'][sync_name]['sync_extensions']
         except:
@@ -159,6 +160,7 @@ class FileOperations_():
                             self.logger_.adiciona_linha_log("Removido: " + str(filepath_dest))
                         except Exception as err:
                             self.logger_.adiciona_linha_log(str(err) + "Erro ao remover arquivo. " + str(filepath_dest))
+                            self.frame.zabbix_metric[0] = 1
                             self.frame.set_error_led()       
                         """Cópia de arquivos"""
                     elif not os.path.exists(filepath_dest):         # Se o arquivo não existe no destino, copia para o destino
@@ -166,10 +168,11 @@ class FileOperations_():
                         shutil.copy2(filepath_source, filepath_dest)
                         origem_size = os.path.getsize( str(filepath_source) )
                         destino_size = os.path.getsize( str(filepath_dest) )
-                        self.logger_.adiciona_linha_log("Copiado: " + str(filepath_source) + "[" + str(origem_size) + "]" + " to " + str(filepath_dest) + "[" + str(destino_size) + "]")  
+                        self.logger_.adiciona_linha_log(f"Copiado: {filepath_source} [{origem_size} bytes] to {filepath_dest} [{destino_size} bytes]")  
                         if (origem_size != destino_size):
                             os.remove(filepath_dest)
                             self.logger_.adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync.' + str(filepath_source))
+                            self.frame.zabbix_metric[0] = 1
                             self.frame.set_error_led()
                     else:
                         source_mtime = os.stat(filepath_source).st_mtime
@@ -179,17 +182,19 @@ class FileOperations_():
                             shutil.copy2(filepath_source, filepath_dest)
                             origem_size = os.path.getsize( str(filepath_source) )
                             destino_size = os.path.getsize( str(filepath_dest) )
-                            self.logger_.adiciona_linha_log("Sobrescrito: " + str(filepath_source) + "[" + str(origem_size) + "]" + " to " + str(filepath_dest) + "[" + str(destino_size) + "]")
+                            self.logger_.adiciona_linha_log(f"Sobrescrito: {filepath_source} [{origem_size} bytes] to {filepath_dest} [{destino_size} bytes]")
                             if (origem_size != destino_size):
                                 os.remove(filepath_dest)
-                                self.logger_.adiciona_linha_log('Cópia corrompida. Será copiado novamente no próximo sync' + str(filepath_source)) 
+                                self.logger_.adiciona_linha_log(f'Cópia corrompida. Será copiado novamente no próximo sync {filepath_source}') 
+                                self.frame.zabbix_metric[0] = 1
                                 self.frame.set_error_led()
-            self.frame.clear_event_in_progress_led()
+            self.frame.panel_update()
+            self.frame.set_led1_cinza()
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
-            self.frame.zabbix_metric = 1
+            self.frame.zabbix_metric[0] = 1
+            self.frame.set_led1_cinza()
         self.frame.status['evento_acontecendo'] = False
-
 
 if __name__ == '__main__':
     import wx
@@ -203,7 +208,6 @@ if __name__ == '__main__':
     status = {
             'sincronizando' : False,
             'evento_acontecendo' : False,
-            'updating_logs' : False
         }
 
     """Criando objeto de adição de registros de log"""

@@ -14,8 +14,7 @@ import wx
 '''Criando variaveis utilizadas pelo sistema'''     
 status = {                              # Evita que multiplos eventos ocorram ao mesmo tempo, causando falhas
         'sincronizando' : False,
-        'evento_acontecendo' : False,
-        'updating_logs' : False
+        'evento_acontecendo' : False
     }
 zabbix_metric = [0]                      #Variavel que carrega as metricas do zabbix
 frame : MyFrame = None
@@ -84,7 +83,7 @@ def main():
         u.start()
         
         """Update panel with past log information on startup"""
-        frame.update_logs()                
+        frame.panel_update()                
         
         """Loop principal da execução da interface gráfica"""
         app.MainLoop()
