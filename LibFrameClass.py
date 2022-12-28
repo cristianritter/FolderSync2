@@ -8,12 +8,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Roo
 task_icon = os.path.join(ROOT_DIR, 'task_icon.png')
 
 def InitLocale(self):
-
-    """
-    Substituição do método padrão devido a problemas relacionados a detecção de locale no Windows 7.
-    Não foi testado no windows 10.
-    """
-
+    """    Substituição do método padrão devido a problemas relacionados a detecção de locale no Windows 7. """
     self.ResetLocale()
     try:
         lang, _ = locale.getdefaultlocale()
@@ -48,28 +43,31 @@ class MyFrame(wx.Frame):
         ld1txt = wx.StaticText(panel, label='Event operation in progress')
         self.led2 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,15))
         ld2txt = wx.StaticText(panel, label='Timed Sync in progress')
-        self.led3 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,15))
-        ld3txt = wx.StaticText(panel, label='Error detected')
+        #self.led3 =  wx.StaticText(panel, wx.ID_ANY, "", size=(20,15))
+        #ld3txt = wx.StaticText(panel, label='Error detected')
 
-        self.logpanel = wx.TextCtrl(panel, value='Ainda não existe um log disponível este mês.', style=wx.TE_MULTILINE | wx.TE_READONLY, size=(-1,-1))
-        self.clear_btn = wx.StaticText(panel, label='(Limpar Erros)')
+        self.logpanel = wx.TextCtrl(panel, value='', style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2, size=(-1,-1))
+        #self.clear_btn = wx.StaticText(panel, label='(Limpar Erros)')
         self.cb1 = wx.CheckBox(panel, label='Visualização completa com descrição de eventos')
         self.cb1.SetValue(True)
-
+        self.searchbox = wx.SearchCtrl(panel, style=wx.TE_PROCESS_ENTER, value='')
         """Configuração de Fonts"""
         TittleFont = wx.Font(18, wx.DEFAULT, wx.NORMAL, wx.BOLD)
         StaticTextTittle.SetFont(TittleFont)
         ButtonFont = wx.Font(7, wx.DEFAULT, wx.FONTSTYLE_ITALIC, wx.BOLD, underline=True)
-        self.clear_btn.SetFont(ButtonFont)
+        #self.clear_btn.SetFont(ButtonFont)
 
         """Configuração de Items Colors"""    
         self.led1.SetBackgroundColour('gray')
         self.led2.SetBackgroundColour('gray')
-        self.led3.SetBackgroundColour('gray')
+        #self.led3.SetBackgroundColour('gray')
 
         """Items Binds"""
-        self.clear_btn.Bind(wx.EVT_LEFT_DOWN, self.clear_error_led)
+        #self.clear_btn.Bind(wx.EVT_LEFT_DOWN, self.clear_error_led)
         self.cb1.Bind(wx.EVT_CHECKBOX, self.on_checkbox_change)
+        self.searchbox.Bind(wx.EVT_TEXT_ENTER, self.searchevent)
+        self.searchbox.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.searchevent)
+        
         self.Bind(wx.EVT_CLOSE, self.on_hide)
         self.delay_update_panel = wx.CallLater(300, self.panel_update)
         self.delay_update_panel.Stop()
@@ -78,7 +76,9 @@ class MyFrame(wx.Frame):
         linha_titulo = wx.BoxSizer(wx.HORIZONTAL)
         linha_titulo.Add(StaticTextTittle, 0, wx.ALL, border=5)
         linha_filter = wx.BoxSizer(wx.HORIZONTAL)
-        linha_filter.Add(self.cb1, 0, wx.TOP, 5)
+        linha_filter.Add(self.searchbox, 0, wx.ALL, 5)
+        linha_filter.AddSpacer(30)
+        linha_filter.Add(self.cb1, 0, wx.TOP, 8)
         linha_led = wx.BoxSizer(wx.HORIZONTAL)
         linha_led.Add(self.led1, 0, wx.ALL, border=5)
         linha_led.Add(ld1txt, 0, wx.ALL, border=5)
@@ -86,10 +86,10 @@ class MyFrame(wx.Frame):
         linha_led.Add(self.led2, 0, wx.ALL, border=5)
         linha_led.Add(ld2txt, 0, wx.ALL, border=5)
         linha_led.AddSpacer(20)
-        linha_led.Add(self.led3, 0, wx.ALL, border=5)
-        linha_led.Add(ld3txt, 0, wx.ALL, border=5)
+        #linha_led.Add(self.led3, 0, wx.ALL, border=5)
+        #linha_led.Add(ld3txt, 0, wx.ALL, border=5)
         linha_led.AddSpacer(20)
-        linha_led.Add(self.clear_btn, 0, wx.ALL, border=5)
+        #linha_led.Add(self.clear_btn, 0, wx.ALL, border=5)
         
         coluna_todo_conteudo = wx.BoxSizer(wx.VERTICAL) 
         coluna_todo_conteudo.Add(linha_titulo, 0, wx.CENTER | wx.ALL, border=10)
@@ -101,6 +101,11 @@ class MyFrame(wx.Frame):
         self.Center()
         self.Show()
 
+    def searchevent(self, event):
+        self.logpanel.Clear()
+        self.panel_update()
+        self.searchbox.Clear()
+    
     def on_checkbox_change(self, event=None):
         self.logpanel.Clear()                               # Limpa o painel caso o checkbox seja acionado
         if not self.delay_update_panel.IsRunning():                               # if delay timer does not run, start it, either restart it
@@ -142,15 +147,15 @@ class MyFrame(wx.Frame):
         self.led2.SetBackgroundColour('gray')
         self.Refresh()
 
-    def set_error_led(self, event=None):
-        """Método que troca a cor do sinalizador de erro ocorrido para vermelho"""
-        self.led3.SetBackgroundColour('Red')
-        self.Refresh()
+    #def set_error_led(self, event=None):
+    #    """Método que troca a cor do sinalizador de erro ocorrido para vermelho"""
+    #    self.led3.SetBackgroundColour('Red')
+    #    self.Refresh()
 
-    def clear_error_led(self, event=None):
-        """Método que troca a cor do sinalizador de erro ocorrido para cinza"""
-        self.led3.SetBackgroundColour('gray')
-        self.Refresh()
+    #def clear_error_led(self, event=None):
+    #    """Método que troca a cor do sinalizador de erro ocorrido para cinza"""
+    #    self.led3.SetBackgroundColour('gray')
+    #    self.Refresh()
 
     def get_log_data_lines(self):
         dataPartialLogFname = datetime.now().strftime('_%Y%m')
@@ -172,8 +177,15 @@ class MyFrame(wx.Frame):
                 if (self.cb1.GetValue() == False):      # Filtra linhas com a palavra 'Event'
                     if ('Event' in linha):
                         continue
+                if (self.searchbox.GetValue()!="" and self.searchbox.GetValue().lower() in linha.lower()):
+                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
+                elif ('erro' in linha.lower()):
+                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.RED, wx.BLACK))
+                else:
+                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.BLACK, wx.WHITE))
+               
                 if linha not in lines_from_panel:       # Adiciona as linhas não filtradas
-                    self.logpanel.AppendText(linha)
+                    self.logpanel.AppendText(f'{linha}')
         else:
             self.logpanel.AppendText("Não há nada aqui por enquanto...")        # Se não houver informações no arquivo
       

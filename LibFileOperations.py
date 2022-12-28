@@ -121,15 +121,15 @@ class FileOperations_():
                         time.sleep(0.1)
                     if error_counter == 0:
                         self.frame.zabbix_metric[0] = 0
-                        self.frame.clear_error_led()
+                        #self.frame.clear_error_led()
                     else:
                         self.logger_.adiciona_linha_log(f'Erro durante a sincronização de {error_counter} diretório(s).')
                         self.frame.zabbix_metric[0] = 1
-                        self.frame.set_error_led()
+                        #self.frame.set_error_led()
                 except Exception as Err:
                     self.logger_.adiciona_linha_log(f'Erro em sync_all_folders: {sys._getframe().f_code.co_name}, Descrição: {Err}')
                     self.frame.zabbix_metric[0] = 1
-                    self.frame.set_error_led()               
+                    #self.frame.set_error_led()               
 
                 self.frame.status['sincronizando'] = False
                 self.frame.set_led2_cinza()
@@ -139,7 +139,7 @@ class FileOperations_():
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'Erro em Fileoperations.syncs thread: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             self.frame.zabbix_metric[0] = 1
-            self.frame.set_error_led()
+            #self.frame.set_error_led()
 
     def event_operations(self, filepath_source, path_dest, sync_name, event):
         """Método reproduzido quando um evento é detectado em algum diretório monitorado"""
@@ -165,7 +165,7 @@ class FileOperations_():
                         except Exception as err:
                             self.logger_.adiciona_linha_log(str(err) + "Erro ao remover arquivo. " + str(filepath_dest))
                             self.frame.zabbix_metric[0] = 1
-                            self.frame.set_error_led()       
+                            #self.frame.set_error_led()       
                         """Cópia de arquivos"""
                     elif not os.path.exists(filepath_dest):         # Se o arquivo não existe no destino, copia para o destino
                         self.aguarda_liberar_arquivo(filepath_source)
@@ -184,7 +184,7 @@ class FileOperations_():
                                 os.remove(filepath_dest)
                                 self.logger_.adiciona_linha_log(f'Cópia corrompida. Será copiado novamente no próximo sync {filepath_source}') 
                                 self.frame.zabbix_metric[0] = 1
-                                self.frame.set_error_led()
+                                #self.frame.set_error_led()
             self.frame.panel_update()
             self.frame.set_led1_cinza()
         except Exception as Err:
