@@ -19,9 +19,124 @@
         }
     },   
     "folders_to_sync" : {
-        "sync450" : {
+        "sync003" : {
+            "origem" : "E:\\Midia_plus\\ATL_CHA\\Roteiros",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Programacao",
+            "sync_extensions" : ["txt", "pl1"]
+        },
+        "sync004" : {
+            "origem" : "E:\\Midia_plus\\ATL_CHA\\Roteiros",
+            "destino" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Programacao",
+            "sync_extensions" : ["txt", "pl1"]
+        },
+        "sync500" : {
+            "origem" : "E:\\RadiosDados\\Atlantida_Chapeco\\Musicas",
+            "destino" : "\\\\10.147.71.11\\RadioDados\\Musicas",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync501" : {
+            "origem" : "E:\\RadiosDados\\Atlantida_Chapeco\\Programas Políticos",
+            "destino" : "\\\\10.147.71.11\\RadioDados\\Programas Politicos",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync502" : {
+            "origem" : "E:\\RadiosDados\\Atlantida_Chapeco\\Programetes",
+            "destino" : "\\\\10.147.71.11\\RadioDados\\Programetes",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync503" : {
+            "origem" : "E:\\RadiosDados\\Atlantida_Chapeco\\Vinhetas",
+            "destino" : "\\\\10.147.71.11\\RadioDados\\Vinhetas",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync504" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Audio",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Audio",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync505" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Audio\\TEMP",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Audio\\TEMP",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync506" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\CAB",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\CAB",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync507" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\CAB\\TEMP",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\CAB\\TEMP",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync508" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Calhau",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Calhau",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync509" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Politica",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Politica",
+            "sync_extensions" : ["mp3", "wav"]
+        },               
+        "sync510" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Politica\\TEMP",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Politica\\TEMP",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync511" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Programetes",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Programetes",
+            "sync_extensions" : ["mp3", "wav"]
+        },               
+        "sync512" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Programetes\\TEMP",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Programetes\\TEMP",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync513" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Promo",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Promo",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync514" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Promo\\TEMP",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Promo\\TEMP",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync515" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\TDS",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\TDS",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync516" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Temporario",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Temporario",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync517" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\VEC",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\VEC",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync518" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\VEC\\TEMP",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\VEC\\TEMP",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync519" : {
+            "origem" : "E:\\RadiosDados\\Atlantida_Chapeco\\Musicas_Chapeco",
+            "destino" : "\\\\10.147.71.11\\RadioDados\\Musicas_Chapeco",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync520" : {
+            "origem" : "E:\\RadiosComercial\\Atlantida_Chapeco\\Comerciais",
+            "destino" : "\\\\10.147.71.11\\RadioComercial\\Comerciais",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync550" : {
             "origem" : "E:\\RadiosDados\\Atlantida\\Musicas",
-            "destino" : "E:\\RadiosDados\\Atlantida_Blumenau\\Musicas",
+            "destino" : "E:\\RadiosDados\\Atlantida_Chapeco\\Musicas",
             "sync_extensions" : ["mp3", "wav"]
         }
     }
