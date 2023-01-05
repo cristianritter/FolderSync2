@@ -19,9 +19,69 @@
         }
     },   
     "folders_to_sync" : {
-        "sync450" : {
-            "origem" : "E:\\RadiosDados\\Atlantida\\Musicas",
-            "destino" : "E:\\RadiosDados\\Atlantida_Blumenau\\Musicas",
+        "sync011" : {
+            "origem" : "E:\\Midia_plus\\GLOBO_JOI\\Roteiros",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Programacao",
+            "sync_extensions" : ["txt", "pl1"]
+        },
+        "sync012" : {
+            "origem" : "E:\\Midia_plus\\GLOBO_JOI\\Roteiros",
+            "destino" : "E:\\RadiosComercial\\CBN_Joinville\\Programacao",
+            "sync_extensions" : ["txt", "pl1"]
+        },
+        "sync800" : {
+            "origem" : "E:\\RadiosDados\\CBN_Joinville\\Musicas",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Musical\\Musicas",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync801" : {
+            "origem" : "E:\\RadiosDados\\CBN_Joinville\\Programas",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Musical\\Programas",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync802" : {
+            "origem" : "E:\\RadiosDados\\CBN_Joinville\\Vinhetas",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Musical\\Vinhetas",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync803" : {
+            "origem" : "E:\\RadiosComercial\\CBN_Joinville\\Audio",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Audio",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync804" : {
+            "origem" : "E:\\RadiosComercial\\CBN_Joinville\\Audio\\TEMP",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Audio\\TEMP",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync805" : {
+            "origem" : "E:\\RadiosComercial\\CBN_Joinville\\Audio\\Temporario",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Audio\\Temporario",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync806" : {
+            "origem" : "E:\\RadiosComercial\\CBN_Joinville\\TDS",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\TDS",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync807" : {
+            "origem" : "E:\\RadiosComercial\\CBN_Joinville\\Temporario",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Temporario",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync808" : {
+            "origem" : "E:\\RadiosJornalismo\\CBN_Joinville\\áudio",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Jornalismo\\áudio",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync809" : {
+            "origem" : "E:\\RadiosJornalismo\\CBN_Joinville\\Vinhetas",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Jornalismo\\Vinhetas",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync810" : {
+            "origem" : "E:\\RadiosComercial\\CBN_Joinville\\Comerciais",
+            "destino" : "\\\\10.146.113.12\\RadiosComercial\\Globo\\Comerciais",
             "sync_extensions" : ["mp3", "wav"]
         }
     }
