@@ -1,7 +1,7 @@
 {
     "trayicon_alias" : "ATL_JOI",
     "check_all_files_interval" : 300,
-    "zabbix_key" : "status_foldersync_atljoi",
+    "zabbix_key" : "foldersync_atljoi",
     "zabbix_instances" : {
         "instance1" : {
             "enabled" : 1,

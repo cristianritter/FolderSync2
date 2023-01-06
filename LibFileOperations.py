@@ -171,20 +171,23 @@ class FileOperations_():
                         self.aguarda_liberar_arquivo(filepath_source)
                         shutil.copy2(filepath_source, filepath_dest)
                         self.logger_.adiciona_linha_log(f"Copiado: {filepath_source} [{os.path.getsize(str(filepath_source))} bytes] to {filepath_dest} [{os.path.getsize(str(filepath_dest))} bytes]")  
-                    else:                                           # Se data de modificação ou tamanhos diferentes:
-                        origem_size = os.path.getsize(str(filepath_source))
-                        destino_size = os.path.getsize(str(filepath_dest))
-                        source_mtime = os.stat(filepath_source).st_mtime
+                    else:                                           # Se o arquivo existe na origem e no destino:
+                        origem_size = os.path.getsize(str(filepath_source))     #verifica o tamanho do arquivo de origem
+                        destino_size = os.path.getsize(str(filepath_dest))      # verifica o tamanho do arquivo de destino
+                        source_mtime = os.stat(filepath_source).st_mtime        # verifica data de modificacao dos arquivos
                         dest_mtime = os.stat(filepath_dest).st_mtime
-                        if source_mtime != dest_mtime or origem_size != destino_size:
+                        if source_mtime != dest_mtime or origem_size != destino_size:       # se o tamanho divergir ou a data de modificacao
                             self.aguarda_liberar_arquivo(filepath_source)
-                            shutil.copy2(filepath_source, filepath_dest)
+                            shutil.copy2(filepath_source, filepath_dest)               # realizacao uma sobrescrição
+                            destino_size = os.path.getsize(str(filepath_dest))      #atualiza tamanho do arquivo de destino
                             self.logger_.adiciona_linha_log(f"Sobrescrito: {filepath_source} [{origem_size} bytes] to {filepath_dest} [{destino_size} bytes]")
                             if (origem_size != destino_size):
                                 os.remove(filepath_dest)
                                 self.logger_.adiciona_linha_log(f'Cópia corrompida. Será copiado novamente no próximo sync {filepath_source}') 
                                 self.frame.zabbix_metric[0] = 1
                                 #self.frame.set_error_led()
+            else:
+                self.logger_.adiciona_linha_log(f'Evento descartado por não ser considerado arquivo válido: {event}')    
             self.frame.panel_update()
             self.frame.set_led1_cinza()
         except Exception as Err:

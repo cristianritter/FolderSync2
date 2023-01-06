@@ -1,7 +1,7 @@
 {
     "trayicon_alias" : "CBN_JOI",
     "check_all_files_interval" : 300,
-    "zabbix_key" : "status_foldersync_cbnjoi",
+    "zabbix_key" : "foldersync_cbnjoi",
     "zabbix_instances" : {
         "instance1" : {
             "enabled" : 1,

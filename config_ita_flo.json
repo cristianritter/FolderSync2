@@ -1,7 +1,7 @@
 {
     "trayicon_alias" : "ITA_FLO",
     "check_all_files_interval" : 300,
-    "zabbix_key" : "status_foldersync_itaflo",
+    "zabbix_key" : "foldersync_itaflo",
     "zabbix_instances" : {
         "instance1" : {
             "enabled" : 1,

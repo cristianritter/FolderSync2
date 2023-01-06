@@ -1,7 +1,7 @@
 {
     "trayicon_alias" : "ATL_CHA",
     "check_all_files_interval" : 300,
-    "zabbix_key" : "status_foldersync_atlcha",
+    "zabbix_key" : "foldersync_atlcha",
     "zabbix_instances" : {
         "instance1" : {
             "enabled" : 1,

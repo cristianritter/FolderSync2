@@ -1,7 +1,7 @@
 {
     "trayicon_alias" : "CBN_FLO",
     "check_all_files_interval" : 300,
-    "zabbix_key" : "status_foldersync_cbnflo",
+    "zabbix_key" : "foldersync_cbnflo",
     "zabbix_instances" : {
         "instance1" : {
             "enabled" : 1,

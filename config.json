@@ -25,7 +25,7 @@
             "exemplo_sync_exten" : ["ext", "ext2", "..."],
             "origem" : "C:\\Teste",
             "destino" : "C:\\Teste2",
-            "sync_extensions" : ["txt", "mp3"]
+            "sync_extensions" : ["txt", "mp3", "wav"]
         }
     }
 }

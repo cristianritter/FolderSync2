@@ -170,24 +170,27 @@ class MyFrame(wx.Frame):
 
     def panel_update(self, event=None):
         """Atualiza o painel de logs"""
+        empty_panel_string = "Não há nada aqui por enquanto..."
         lines_from_file = self.get_log_data_lines()         # Captura informação do arquivo
         lines_from_panel = self.logpanel.GetValue()         # Captura informação do painel
         if lines_from_file:                             # Se houver informação no arquivo
+            if empty_panel_string in lines_from_panel:
+                self.logpanel.Clear()
             for linha in lines_from_file:
                 if (self.cb1.GetValue() == False):      # Filtra linhas com a palavra 'Event'
                     if ('Event' in linha):
                         continue
                 if (self.searchbox.GetValue()!="" and self.searchbox.GetValue().lower() in linha.lower()):
                     self.logpanel.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
-                elif ('erro' in linha.lower()):
+                elif ('erro' in linha.lower() or 'corrompida' in linha.lower()):
                     self.logpanel.SetDefaultStyle(wx.TextAttr(wx.RED, wx.BLACK))
                 else:
                     self.logpanel.SetDefaultStyle(wx.TextAttr(wx.BLACK, wx.WHITE))
                
                 if linha not in lines_from_panel:       # Adiciona as linhas não filtradas
                     self.logpanel.AppendText(f'{linha}')
-        else:
-            self.logpanel.AppendText("Não há nada aqui por enquanto...")        # Se não houver informações no arquivo
+        elif not lines_from_panel:
+            self.logpanel.AppendText(empty_panel_string)        # Se não houver informações no arquivo
       
 if __name__ == '__main__':
     

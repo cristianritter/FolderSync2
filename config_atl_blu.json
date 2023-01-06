@@ -1,8 +1,7 @@
 {
-    "OK" : "OK",
     "trayicon_alias" : "ATL_BLU",
     "check_all_files_interval" : 300,
-    "zabbix_key" : "status_foldersync_atlblu",
+    "zabbix_key" : "foldersync_atlblu",
     "zabbix_instances" : {
         "instance1" : {
             "enabled" : 1,
