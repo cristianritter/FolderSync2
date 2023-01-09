@@ -19,15 +19,40 @@
         }
     },   
     "folders_to_sync" : {
+        "sync016" : {
+            "origem" : "E:\\Midia_plus\\CBN_FLS\\Roteiros",
+            "destino" : "E:\\RadiosComercial\\CBN\\Programacao",
+            "sync_extensions" : ["txt", "pl1"]
+        },
+        "sync329" : {
+            "origem" : "E:\\RadiosComercial\\CBN\\Audio",
+            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Audio",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync330" : {
+            "origem" : "E:\\RadiosComercial\\CBN\\Audio\\TEMP",
+            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Audio\\TEMP",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync336" : {
+            "origem" : "E:\\RadiosComercial\\CBN\\Comerciais",
+            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Comerciais",
+            "sync_extensions" : ["mp3", "wav"]
+        },
         "sync015" : {
             "origem" : "E:\\Midia_plus\\CBN_FLS\\Roteiros",
             "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Programacao",
             "sync_extensions" : ["txt", "pl1"]
         },
-        "sync016" : {
-            "origem" : "E:\\Midia_plus\\CBN_FLS\\Roteiros",
-            "destino" : "E:\\RadiosComercial\\CBN\\Programacao",
-            "sync_extensions" : ["txt", "pl1"]
+        "sync331" : {
+            "origem" : "E:\\RadiosComercial\\CBN\\Temporario",
+            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Temporario",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync332" : {
+            "origem" : "E:\\RadiosComercial\\CBN\\Texto",
+            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Texto",
+            "sync_extensions" : ["txt", "pl1", "rtf"]
         },
         "sync300" : {
             "origem" : "E:\\RadiosDados\\CBN\\CBN Exibição\\00 HINOS DE CLUBES",
@@ -119,9 +144,19 @@
             "destino" : "\\\\10.70.40.32\\RadiosDados\\CBN\\CBN Exibição\\CBN CIDADE\\VINHETAS",
             "sync_extensions" : ["mp3", "wav"]
         },
+        "sync334" : {
+            "origem" : "E:\\RadiosDados\\CBN\\CBN Exibição\\CBN SABADO SHOW",
+            "destino" : "\\\\10.70.40.32\\RadiosDados\\CBN\\CBN Exibição\\CBN SABADO SHOW",
+            "sync_extensions" : ["mp3", "wav"]
+        },
         "sync318" : {
             "origem" : "E:\\RadiosDados\\CBN\\CBN Exibição\\CENTRAL DA BOLA",
             "destino" : "\\\\10.70.40.32\\RadiosDados\\CBN\\CBN Exibição\\CENTRAL DA BOLA",
+            "sync_extensions" : ["mp3", "wav"]
+        },
+        "sync335" : {
+            "origem" : "E:\\RadiosDados\\CBN\\CBN Exibição\\GIRO TOTAL",
+            "destino" : "\\\\10.70.40.32\\RadiosDados\\CBN\\CBN Exibição\\GIRO TOTAL",
             "sync_extensions" : ["mp3", "wav"]
         },
         "sync319" : {
@@ -174,44 +209,9 @@
             "destino" : "\\\\10.70.40.32\\RadiosDados\\CBN\\Vinhetas",
             "sync_extensions" : ["mp3", "wav"]
         },
-        "sync329" : {
-            "origem" : "E:\\RadiosComercial\\CBN\\Audio",
-            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Audio",
-            "sync_extensions" : ["mp3", "wav"]
-        },
-        "sync330" : {
-            "origem" : "E:\\RadiosComercial\\CBN\\Audio\\TEMP",
-            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Audio\\TEMP",
-            "sync_extensions" : ["mp3", "wav"]
-        },
-        "sync331" : {
-            "origem" : "E:\\RadiosComercial\\CBN\\Temporario",
-            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Temporario",
-            "sync_extensions" : ["mp3", "wav"]
-        },
-        "sync332" : {
-            "origem" : "E:\\RadiosComercial\\CBN\\Texto",
-            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Texto",
-            "sync_extensions" : ["txt", "pl1", "rtf"]
-        },
         "sync333" : {
             "origem" : "E:\\RadiosJornalismo\\CBN",
             "destino" : "\\\\10.70.40.32\\RadiosJornalismo\\CBN",
-            "sync_extensions" : ["mp3", "wav"]
-        },
-        "sync334" : {
-            "origem" : "E:\\RadiosDados\\CBN\\CBN Exibição\\CBN SABADO SHOW",
-            "destino" : "\\\\10.70.40.32\\RadiosDados\\CBN\\CBN Exibição\\CBN SABADO SHOW",
-            "sync_extensions" : ["mp3", "wav"]
-        },
-        "sync335" : {
-            "origem" : "E:\\RadiosDados\\CBN\\CBN Exibição\\GIRO TOTAL",
-            "destino" : "\\\\10.70.40.32\\RadiosDados\\CBN\\CBN Exibição\\GIRO TOTAL",
-            "sync_extensions" : ["mp3", "wav"]
-        },
-        "sync336" : {
-            "origem" : "E:\\RadiosComercial\\CBN\\Comerciais",
-            "destino" : "\\\\10.70.40.32\\RadiosComercial\\CBN\\Comerciais",
             "sync_extensions" : ["mp3", "wav"]
         }
     }

@@ -1,8 +1,7 @@
 from datetime import datetime
 import os
 import sys
-#if not "MyFrame" in sys.modules:
-#    from LibFrameClass import MyFrame
+#from LibFrameClass import MyFrame
 
 
 class FileLogger_:
@@ -17,7 +16,7 @@ class FileLogger_:
         
         self.LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), pasta_de_logs) 
         self.frame = frame
-
+      
     def checkDirectory(self, dir=None):
         
         '''Confere se o diretório existe, se não existir realiza a criação.'''
@@ -53,10 +52,11 @@ class FileLogger_:
             
         except Exception:
             pass
+        
         try:
-            self.frame.update_logs()                # Este try é necessário caso ocorram eventos antes da criação da intancia frame.update_logs.
-        except:
-            pass
+            self.frame[0].panel_update()                # Este try é necessário caso ocorram eventos antes da criação da intancia frame.update_logs.
+        except Exception as err:
+            print(err)
 
 
 if __name__ == '__main__':

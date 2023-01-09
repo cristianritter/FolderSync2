@@ -17,7 +17,7 @@ status = {                              # Evita que multiplos eventos ocorram ao
         'evento_acontecendo' : False
     }
 zabbix_metric = [0]                      #Variavel que carrega as metricas do zabbix
-frame : MyFrame = None
+frame : MyFrame = [None]
 
 """Criando objeto de adição de registros de log"""
 logger_ = FileLogger_(frame, pasta_de_logs='logs')
@@ -50,13 +50,13 @@ except Exception as Err:
 """Inicializando a interface gráfica"""
 try:
     app = wx.App()                                                                                      # Criação da aplicação wxpython
-    frame = MyFrame(status=status, logger_=logger_, zabbix_metric=zabbix_metric, configs=configs)       # Criação da janela principal d aplicativo
-    TaskBarIcon(frame, configs)                                                                     # Criação do ícone de bandeja
+    frame[0] = MyFrame(status=status, logger_=logger_, zabbix_metric=zabbix_metric, configs=configs)       # Criação da janela principal d aplicativo
+    TaskBarIcon(frame[0], configs)                                                                     # Criação do ícone de bandeja
 except Exception as Err:
     logger_.adiciona_linha_log(f"Erro: {Err} - Erro ao criar a interface gráfica da aplicação wxpython.")
     
 """Criando objeto de operacoes com arquivos"""
-operations_ = FileOperations_(configs, frame, logger_)
+operations_ = FileOperations_(configs, frame[0], logger_)
 
 """Criando sistema de monitoração de alterações em diretórios"""                    
 try:
@@ -83,7 +83,7 @@ def main():
         u.start()
         
         """Update panel with past log information on startup"""
-        frame.panel_update()                
+        frame[0].panel_update()                
         
         """Loop principal da execução da interface gráfica"""
         app.MainLoop()

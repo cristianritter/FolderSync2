@@ -8,12 +8,12 @@ import json
 
 
 class FileOperations_():
-    def __init__(self, config_dict: dict, frame_inst: MyFrame, logger_inst: FileLogger_) -> bool:
+    def __init__(self, config_dict: dict, frame_inst: MyFrame, logger_inst: FileLogger_):
         """Inicialização da classe"""
         self.configs = config_dict
         self.frame = frame_inst
         self.logger_ = logger_inst
-    
+        
     def read_json_from_file(self, filename):                # Carrega um arquivo json para a memória e retorna um dict
         """     Carrega o conteúdo de um arquivo no formato Json para um dicionário"""
         try:
@@ -133,7 +133,7 @@ class FileOperations_():
 
                 self.frame.status['sincronizando'] = False
                 self.frame.set_led2_cinza()
-                self.frame.panel_update()
+                #self.frame.panel_update()
                 sleep_time = int(self.configs['check_all_files_interval'])
                 time.sleep(sleep_time)
         except Exception as Err:
