@@ -176,17 +176,20 @@ class MyFrame(wx.Frame):
         if lines_from_file:                             # Se houver informação no arquivo
             if empty_panel_string in lines_from_panel:
                 self.logpanel.Clear()
+            searchbox_lower_text = self.searchbox.GetValue().lower()
+            if len(searchbox_lower_text) == 0:
+                searchbox_lower_text = '$-$-$'          # cria uma string improvavel de estar presente no texto
             for linha in lines_from_file:
+                linha_lower=linha.lower()               # Para melhorar a velocidade de execução
                 if (self.cb1.GetValue() == False):      # Filtra linhas com a palavra 'Event'
-                    if ('Event' in linha):
+                    if ('event' in linha_lower):
                         continue
-                if (self.searchbox.GetValue()!="" and self.searchbox.GetValue().lower() in linha.lower()):
-                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))
-                elif ('erro' in linha.lower() or 'corrompida' in linha.lower()):
-                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.RED, wx.BLACK))
+                if ('$error' in linha_lower):
+                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.RED, wx.BLACK))        # formatação de erros encontrados
+                elif (searchbox_lower_text in linha_lower):
+                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.WHITE, wx.BLACK))  # formatacao de busca encontrada
                 else:
-                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.BLACK, wx.WHITE))
-               
+                    self.logpanel.SetDefaultStyle(wx.TextAttr(wx.BLACK, wx.WHITE))      # formatação normal               
                 if linha not in lines_from_panel:       # Adiciona as linhas não filtradas
                     self.logpanel.AppendText(f'{linha}')
         elif not lines_from_panel:

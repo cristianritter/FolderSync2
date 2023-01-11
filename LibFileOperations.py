@@ -22,7 +22,7 @@ class FileOperations_():
                 data = json.load(infile)
             return data
         except Exception as Err:
-            print(f'Erro carregando arquivo json. Filename: {filename}, Erro: {Err}')
+            print(f'$Error carregando arquivo json. Filename: {filename}, Erro: {Err}')
             return 0
 
     def aguarda_liberar_arquivo(self, filepath_source):
@@ -73,7 +73,7 @@ class FileOperations_():
                         removed_files.append(file)
                         self.logger_.adiciona_linha_log(f"Removido: {path_dest}")
                     except Exception as Err:
-                        self.logger_.adiciona_linha_log(f"Erro ao remover arquivo. Erro: {Err} Debug: {debug}")
+                        self.logger_.adiciona_linha_log(f"$Error ao remover arquivo. Erro: {Err} Debug: {debug}")
             for item in removed_files:                  # precisa ser feito assim pq o dict não pode ser alterado dentro do loop for
                 destfile_lastmodif_dict.pop(item)       # Remove arquivos apagados da lista de arquivos existentes                
             debug = 'copy files'
@@ -94,7 +94,7 @@ class FileOperations_():
                     return 0                                                # Retorna automaticamente no próximo ciclo
             return 0
         except Exception as err:
-            self.logger_.adiciona_linha_log(f'Problema durante a rotina de folder_mirror. Erro:{err} debug:{debug}')
+            self.logger_.adiciona_linha_log(f'Problema durante a rotina de folder_mirror. $Error:{err} debug:{debug}')
             return 1
 
     def timed_sync_looping(self):
@@ -123,11 +123,11 @@ class FileOperations_():
                         self.frame.zabbix_metric[0] = 0
                         #self.frame.clear_error_led()
                     else:
-                        self.logger_.adiciona_linha_log(f'Erro durante a sincronização de {error_counter} diretório(s).')
+                        self.logger_.adiciona_linha_log(f'$Error durante a sincronização de {error_counter} diretório(s).')
                         self.frame.zabbix_metric[0] = 1
                         #self.frame.set_error_led()
                 except Exception as Err:
-                    self.logger_.adiciona_linha_log(f'Erro em sync_all_folders: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+                    self.logger_.adiciona_linha_log(f'$Error em sync_all_folders: {sys._getframe().f_code.co_name}, Descrição: {Err}')
                     self.frame.zabbix_metric[0] = 1
                     #self.frame.set_error_led()               
 
@@ -137,7 +137,7 @@ class FileOperations_():
                 sleep_time = int(self.configs['check_all_files_interval'])
                 time.sleep(sleep_time)
         except Exception as Err:
-            self.logger_.adiciona_linha_log(f'Erro em Fileoperations.syncs thread: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+            self.logger_.adiciona_linha_log(f'$Error em Fileoperations.syncs thread: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             self.frame.zabbix_metric[0] = 1
             #self.frame.set_error_led()
 
@@ -163,7 +163,7 @@ class FileOperations_():
                             os.remove(filepath_dest)
                             self.logger_.adiciona_linha_log("Removido: " + str(filepath_dest))
                         except Exception as err:
-                            self.logger_.adiciona_linha_log(str(err) + "Erro ao remover arquivo. " + str(filepath_dest))
+                            self.logger_.adiciona_linha_log(str(err) + "$Error ao remover arquivo. " + str(filepath_dest))
                             self.frame.zabbix_metric[0] = 1
                             #self.frame.set_error_led()       
                         """Cópia de arquivos"""
@@ -183,15 +183,15 @@ class FileOperations_():
                             self.logger_.adiciona_linha_log(f"Sobrescrito: {filepath_source} [{origem_size} bytes] to {filepath_dest} [{destino_size} bytes]")
                             if (origem_size != destino_size):
                                 os.remove(filepath_dest)
-                                self.logger_.adiciona_linha_log(f'Cópia corrompida. Será copiado novamente no próximo sync {filepath_source}') 
+                                self.logger_.adiciona_linha_log(f'Cópia corrompida. Será copiado novamente no próximo sync. $error {filepath_source}') 
                                 self.frame.zabbix_metric[0] = 1
                                 #self.frame.set_error_led()
             else:
-                self.logger_.adiciona_linha_log(f'Evento descartado por não ser considerado arquivo válido: {event}')    
+                self.logger_.adiciona_linha_log(f'Evento não tratado pois o arquivo não existe mais na pasta de origem nem na pasta de destino: {event}')    
             self.frame.panel_update()
             self.frame.set_led1_cinza()
         except Exception as Err:
-            self.logger_.adiciona_linha_log(f'Erro em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+            self.logger_.adiciona_linha_log(f'$Error em: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             self.frame.zabbix_metric[0] = 1
             self.frame.set_led1_cinza()
         self.frame.status['evento_acontecendo'] = False

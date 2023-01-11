@@ -45,7 +45,7 @@ try:
             metric= zabbix_metric
         )
 except Exception as Err:
-    logger_.adiciona_linha_log(f"Erro: {Err} - Configuration file 'config.json' can be wrong at Zabbix description.")
+    logger_.adiciona_linha_log(f"$Error: {Err} - Configuration file 'config.json' can be wrong at Zabbix description.")
   
 """Inicializando a interface gráfica"""
 try:
@@ -53,7 +53,7 @@ try:
     frame[0] = MyFrame(status=status, logger_=logger_, zabbix_metric=zabbix_metric, configs=configs)       # Criação da janela principal d aplicativo
     TaskBarIcon(frame[0], configs)                                                                     # Criação do ícone de bandeja
 except Exception as Err:
-    logger_.adiciona_linha_log(f"Erro: {Err} - Erro ao criar a interface gráfica da aplicação wxpython.")
+    logger_.adiciona_linha_log(f"$Error: {Err} - Erro ao criar a interface gráfica da aplicação wxpython.")
     
 """Criando objeto de operacoes com arquivos"""
 operations_ = FileOperations_(configs, frame[0], logger_)
@@ -89,7 +89,7 @@ def main():
         app.MainLoop()
 
     except Exception as Err:
-        logger_.adiciona_linha_log(f'Erro em Main observer start: {sys._getframe().f_code.co_name}, Descrição: {Err}')
+        logger_.adiciona_linha_log(f'$Error em Main observer start: {sys._getframe().f_code.co_name}, Descrição: {Err}')
         exit()          # Saída do aplicativo em caso de problemas na inicialização dos serviços
 
 if __name__ == "__main__":
