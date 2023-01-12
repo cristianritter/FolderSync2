@@ -35,6 +35,8 @@ else:
 """Criando instancias de envio de metricas para o zabbix"""
 try:
     for instance in configs['zabbix_instances'].keys():
+        if not configs['zabbix_instances'][instance]['enabled']:         # Skip disabled instances
+            continue
         ZabbixSender_(
             metric_interval= configs['zabbix_instances'][instance]['send_metrics_interval'], 
             hostname= configs['zabbix_instances'][instance]['hostname'], 
