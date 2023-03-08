@@ -20,14 +20,15 @@ zabbix_metric = [0]                      #Variavel que carrega as metricas do za
 frame : MyFrame = [None]
 
 """Criando objeto de adição de registros de log"""
-logger_ = FileLogger_(frame, pasta_de_logs='logs')
+logger_ = FileLogger_(frame, pasta_de_logs='./logs')
 
 '''Carregando informações do diretório raiz do projeto'''
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
 
 '''Carregando configurações...'''
-if os.path.isfile('config.json'):
-    configs = FileOperations_.read_json_from_file(None, "config.json")
+config_filepath = './user/config.json'
+if os.path.isfile(config_filepath):
+    configs = FileOperations_.read_json_from_file(None, config_filepath)
 else:
     logger_.adiciona_linha_log(f" Configuration file 'Config.json' was not found.")
     raise FileNotFoundError(f" Configuration file 'config.json' was not found.")

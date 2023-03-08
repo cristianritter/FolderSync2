@@ -2,7 +2,8 @@ import wx
 import wx.adv
 import os
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-task_icon = os.path.join(ROOT_DIR, 'task_icon.png')
+#task_icon = os.path.join(ROOT_DIR, 'public/ico_large.png')
+task_icon = '.\public\ico_large.png'
 
 
 class TaskBarIcon(wx.adv.TaskBarIcon):

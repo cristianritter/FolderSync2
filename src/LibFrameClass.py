@@ -5,7 +5,9 @@ import locale
 from LibFileLogger import FileLogger_
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-task_icon = os.path.join(ROOT_DIR, 'task_icon.png')
+#task_icon = os.path.join(ROOT_DIR, 'task_icon.png')
+task_icon = './public/ico_large.png'
+
 
 def InitLocale(self):
     """    Substituição do método padrão devido a problemas relacionados a detecção de locale no Windows 7. """
