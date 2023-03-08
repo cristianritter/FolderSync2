@@ -46,37 +46,57 @@ class FileOperations_():
                 return True
         return False
 
-    def getfilelistbymodiftime(self, filespath, sync_extensions):
-        files_last_modif_dict = {}
-        for e in os.scandir(filespath):          # scanner do diretório
-            if e.is_file():                 # para cada arquivo encontrado:
-                if (not os.path.splitext(e.name)[1][1:].lower() in ' '.join(sync_extensions).lower()) & (len(sync_extensions) > 0):
-                    continue                # ignora o arquivo se não estiver na lista de extensões a serem trabalhadas
-                files_last_modif_dict[e.name.lower()]=e.stat().st_mtime       # verifica a data de modificacao do arquivo e adiciona a lista
-        return files_last_modif_dict
+    def get_dict_files_list(self, filespath, sync_extensions):
+        """ Retorna uma lista com todos os nomes dos arquivos no diretorio"""
+        try:
+            files_last_modif_dict = {}
+            for e in os.scandir(filespath):          # scanner do diretório
+                if e.is_file():                 # para cada arquivo encontrado:
+                    if (not os.path.splitext(e.name)[1][1:].lower() in ' '.join(sync_extensions).lower()) & (len(sync_extensions) > 0):
+                        continue                # ignora o arquivo se não estiver na lista de extensões a serem trabalhadas
+                    files_last_modif_dict[e.name.lower()]=e.stat().st_mtime       # verifica a data de modificacao do arquivo e adiciona a lista
+            return files_last_modif_dict
+        except Exception as err:
+            self.logger_.adiciona_linha_log(f'Problema em get_dict_files_list. $Error:{err}')
+            return 1
+
+    def get_dir_files_list(self, filespath):
+        """ Retorna uma lista com todos os nomes dos arquivos no diretorio"""
+        try:
+            all_filenames_list = []
+            for e in os.scandir(filespath):          # scanner do diretório
+                if e.is_file():                 # para cada arquivo encontrado:
+                    all_filenames_list.append(e.name.lower()) #adiciona a lista
+            return all_filenames_list
+        except Exception as err:
+            self.logger_.adiciona_linha_log(f'Problema em get_dir_files_list. $Error:{err}')
+            return 1
+        
+    def remove_files_from_dest_if_not_in_source(self, source, dest):
+        source_files_list = self.get_dir_files_list(source)
+        for file in self.get_dir_files_list(dest):
+            path_dest = os.path.join(dest, file)
+            if file not in source_files_list:       # Verifica se arquivos existentes na pasta de destino existem na pasta de origem
+                try:
+                    os.remove(path_dest)                    # Remove os arquivos que não existem na pasta de origem
+                    self.logger_.adiciona_linha_log(f"Removido: {path_dest}")
+                except Exception as Err:
+                    self.logger_.adiciona_linha_log(f"$Error ao remover arquivo. Erro: {Err} Debug: {debug}")
+            
+    def filter_file_extensions(self, files_list, file_extensions):
+        pass
 
     def folder_mirror(self, source, dest, sync_extensions):
         """Sincroniza dois diretórios, copiando e/ou excluindo arquivos conforme a necessidade"""  
-        destfile_lastmodif_dict=dict()                # Contém a lista de arquivos da pasta de destino. ->    Key=filename, value=timeoflastmodification
-        sourcefile_lastmodif_dict=dict()                     # Contém a lista de arquivos da pasta de origem.  ->    Key=filename, value=timeoflastmodification
         try:
-            debug = 'scan source and dest folders'             # identificação do ponto de execução para verificação de falhas
-            destfile_lastmodif_dict = self.getfilelistbymodiftime(dest, sync_extensions)
-            sourcefile_lastmodif_dict = self.getfilelistbymodiftime(source, sync_extensions)       
-            debug = 'remove files'
-            removed_files = []
-            for file in destfile_lastmodif_dict:
-                path_dest = os.path.join(dest, file)
-                if file not in sourcefile_lastmodif_dict:       # Verifica se arquivos existentes na pasta de destino existem na pasta de origem
-                    try:
-                        os.remove(path_dest)                    # Remove os arquivos que não existem na pasta de origem
-                        removed_files.append(file)
-                        self.logger_.adiciona_linha_log(f"Removido: {path_dest}")
-                    except Exception as Err:
-                        self.logger_.adiciona_linha_log(f"$Error ao remover arquivo. Erro: {Err} Debug: {debug}")
-            for item in removed_files:                  # precisa ser feito assim pq o dict não pode ser alterado dentro do loop for
-                destfile_lastmodif_dict.pop(item)       # Remove arquivos apagados da lista de arquivos existentes                
+            debug = 'remove files'   
+            self.remove_files_from_dest_if_not_in_source(source, dest)
+        
             debug = 'copy files'
+            destfile_lastmodif_dict=dict()                # Contém a lista de arquivos da pasta de destino. ->    Key=filename, value=timeoflastmodification
+            sourcefile_lastmodif_dict=dict()                     # Contém a lista de arquivos da pasta de origem.  ->    Key=filename, value=timeoflastmodification
+            destfile_lastmodif_dict = self.get_dict_files_list(dest, sync_extensions)
+            sourcefile_lastmodif_dict = self.get_dict_files_list(source, sync_extensions)       
             thistime=round(time.time())
             for file in sourcefile_lastmodif_dict:
                 path_source = os.path.join(source, file)

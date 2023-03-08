@@ -149,16 +149,6 @@ class MyFrame(wx.Frame):
         self.led2.SetBackgroundColour('gray')
         self.Refresh()
 
-    #def set_error_led(self, event=None):
-    #    """Método que troca a cor do sinalizador de erro ocorrido para vermelho"""
-    #    self.led3.SetBackgroundColour('Red')
-    #    self.Refresh()
-
-    #def clear_error_led(self, event=None):
-    #    """Método que troca a cor do sinalizador de erro ocorrido para cinza"""
-    #    self.led3.SetBackgroundColour('gray')
-    #    self.Refresh()
-
     def get_log_data_lines(self):
         dataPartialLogFname = datetime.now().strftime('_%Y%m')
         logFilename = f'log{dataPartialLogFname}.txt'     
