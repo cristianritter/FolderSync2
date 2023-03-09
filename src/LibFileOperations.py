@@ -60,6 +60,15 @@ class FileOperations_():
             self.logger_.adiciona_linha_log(f'Problema em get_dict_files_list. $Error:{err}')
             return 1
 
+    def get_filename_type(self, filename):
+        """Retorna o tipo de um arquivo. Ex: txt, mp3, etc"""
+        return os.path.splitext(filename)[1][1:].lower()
+
+    def check_if_file_extension_is_set_to_be_synced(self, filename, sync_extensions):
+        if (len(sync_extensions) == 0): # Retorna True se não existem restrições de extensões a serem sincronizadas
+            return True
+        return self.get_filename_type(filename).lower() in ' '.join(sync_extensions).lower() # Verifica se a extensão do arquivo está incluida em sync_extensions
+                    
     def get_dir_files_list(self, filespath):
         """ Retorna uma lista com todos os nomes dos arquivos no diretorio"""
         try:
@@ -72,54 +81,65 @@ class FileOperations_():
             self.logger_.adiciona_linha_log(f'Problema em get_dir_files_list. $Error:{err}')
             return 1
         
-    def remove_files_from_dest_if_not_in_source(self, source, dest):
+    def remove_files_from_dest_if_not_in_source(self, source, dest, sync_extensions):
+        """Verifica todos os arquivos do destino e verifica se estão na origem. Se não existirem na origem, exclui do destino."""
         source_files_list = self.get_dir_files_list(source)
         for file in self.get_dir_files_list(dest):
-            path_dest = os.path.join(dest, file)
+            dest_file = os.path.join(dest, file)
+            if not self.check_if_file_extension_is_set_to_be_synced(dest_file, sync_extensions):
+                continue
             if file not in source_files_list:       # Verifica se arquivos existentes na pasta de destino existem na pasta de origem
                 try:
-                    os.remove(path_dest)                    # Remove os arquivos que não existem na pasta de origem
-                    self.logger_.adiciona_linha_log(f"Removido: {path_dest}")
+                    os.remove(dest_file)                    # Remove os arquivos que não existem na pasta de origem
+                    self.logger_.adiciona_linha_log(f"Removido: {dest_file}")
                 except Exception as Err:
-                    self.logger_.adiciona_linha_log(f"$Error ao remover arquivo. Erro: {Err} Debug: {debug}")
-            
-    def get_file_modification_timestamp(self):
-        pass
+                    self.logger_.adiciona_linha_log(f"$Error ao remover arquivo. Erro: {Err} ")
 
-    def filter_file_extensions(self, files_list, file_extensions):
-        pass
+    def copy_files_from_source_if_not_in_dest(self, source, dest, sync_extensions):
+        started_task_timestamp=round(time.time())         # Armazena o horário de inicio da tarefa no diretório atual
+            
+        source_files_list = self.get_dir_files_list(source)
+        for file in source_files_list:
+            source_file = os.path.join(source, file)
+            dest_file = os.path.join(dest, file)
+
+            if not self.check_if_file_extension_is_set_to_be_synced(dest_file, sync_extensions):
+                continue
+
+            elif not os.path.isfile(dest_file) or self.get_file_modification_timestamp(dest_file) != self.get_file_modification_timestamp(source_file):
+                self.copy_file(source_file, dest_file)
+                
+            if (round(time.time()) > ( started_task_timestamp + 120) ):               # Passa para o próximo diretório caso a rotina passe de 2 minutos nesta pasta
+                return 0
+
+    def check_all_files_and_remove_if_files_are_not_equals(self, source, dest, sync_extensions):
+        source_files_list = self.get_dir_files_list(source)
+        for file in source_files_list:
+            source_file = os.path.join(source, file)
+            dest_file = os.path.join(dest, file)
+            if not self.check_if_file_extension_is_set_to_be_synced(dest_file, sync_extensions):
+                continue
+            self.check_and_remove_if_both_files_are_not_same_size(source_file, dest_file)
+            
+    def copy_file(self, source_filename, dest_filename):
+        if self.aguarda_liberar_arquivo(source_filename):       # Se o arquivo estiver preso e a cópia for impedida retorna erro 1
+            return 1  
+        if os.path.isfile(dest_filename):
+            self.logger_.adiciona_linha_log(f"Sobrescrito: {source_filename} to {dest_filename} ")                   
+        else:
+            self.logger_.adiciona_linha_log(f"Copiado: {source_filename} to {dest_filename} ")      
+        shutil.copy2(source_filename, dest_filename)                # Copia o arquivo                              
+
+    def get_file_modification_timestamp(self, file):
+        return os.path.getmtime(file)
 
     def folder_mirror(self, source, dest, sync_extensions):
         """Sincroniza dois diretórios, copiando e/ou excluindo arquivos conforme a necessidade"""  
         try:
             debug = 'remove files'   
-            self.remove_files_from_dest_if_not_in_source(source, dest)
-        
-
-            debug = 'copy files'
-            thistime=round(time.time())
-            
-            destfile_lastmodif_dict=dict()                # Contém a lista de arquivos da pasta de destino. ->    Key=filename, value=timeoflastmodification
-            sourcefile_lastmodif_dict=dict()                     # Contém a lista de arquivos da pasta de origem.  ->    Key=filename, value=timeoflastmodification
-            
-            destfile_lastmodif_dict = self.get_dict_files_list(dest, sync_extensions)
-            sourcefile_lastmodif_dict = self.get_dict_files_list(source, sync_extensions)       
-            
-            for file in sourcefile_lastmodif_dict:
-                path_source = os.path.join(source, file)
-                path_dest = os.path.join(dest, file)
-                                                                # Se o arquivo não estiver na lista de destino ou tiver tamanho diferente:
-                if file not in destfile_lastmodif_dict or sourcefile_lastmodif_dict[file] != destfile_lastmodif_dict[file]:    
-                    if self.aguarda_liberar_arquivo(path_source):       # Se o arquivo estiver preso e a cópia for impedida retorna erro 1
-                        return 1
-                    shutil.copy2(path_source, path_dest)                # Copia o arquivo              
-                    if file not in destfile_lastmodif_dict:     # Se arquivo não existia adiciona informação de cópia
-                        self.logger_.adiciona_linha_log(f"Copiado: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")
-                    else:                                       # Se existia adiciona informação de sobrescrita
-                        self.logger_.adiciona_linha_log(f"Sobrescrito: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")         
-                
-                if (round(time.time()) > ( thistime + 120) ):               # Passa para o próximo diretório caso a rotina passe de 2 minutos nesta pasta
-                    return 0                                                # Retorna automaticamente no próximo ciclo
+            self.remove_files_from_dest_if_not_in_source(source, dest, sync_extensions)
+            self.copy_files_from_source_if_not_in_dest(source, dest, sync_extensions)
+            self.check_all_files_and_remove_if_files_are_not_equals(source, dest, sync_extensions)
             return 0
         except Exception as err:
             self.logger_.adiciona_linha_log(f'Problema durante a rotina de folder_mirror. $Error:{err} debug:{debug}')
@@ -149,33 +169,47 @@ class FileOperations_():
                         time.sleep(0.1)
                     if error_counter == 0:
                         self.frame.zabbix_metric[0] = 0
-                        #self.frame.clear_error_led()
                     else:
                         self.logger_.adiciona_linha_log(f'$Error durante a sincronização de {error_counter} diretório(s).')
                         self.frame.zabbix_metric[0] = 1
-                        #self.frame.set_error_led()
                 except Exception as Err:
                     self.logger_.adiciona_linha_log(f'$Error em sync_all_folders: {sys._getframe().f_code.co_name}, Descrição: {Err}')
                     self.frame.zabbix_metric[0] = 1
-                    #self.frame.set_error_led()               
-
+            
                 self.frame.status['sincronizando'] = False
                 self.frame.set_led2_cinza()
-                #self.frame.panel_update()
                 sleep_time = int(self.configs['check_all_files_interval'])
                 time.sleep(sleep_time)
         except Exception as Err:
             self.logger_.adiciona_linha_log(f'$Error em Fileoperations.syncs thread: {sys._getframe().f_code.co_name}, Descrição: {Err}')
             self.frame.zabbix_metric[0] = 1
-            #self.frame.set_error_led()
+       
+    def remove_file_from_dest_if_not_source(self, source_file, dest_file):
+        if not os.path.exists(source_file):         # Se o arquivo não existe na origem, apaga no destino
+            try:
+                os.remove(dest_file)
+                self.logger_.adiciona_linha_log("Removido: " + str(dest_file))
+            except Exception as err:
+                self.logger_.adiciona_linha_log(str(err) + "$Error ao remover arquivo. " + str(dest_file))
+                self.frame.zabbix_metric[0] = 1
+        
+    def check_and_remove_if_both_files_are_not_same_size(self, source_file, dest_file):
+        source_file_size = os.path.getsize(str(source_file))     #verifica o tamanho do arquivo de origem
+        dest_file_size = os.path.getsize(str(dest_file))      # verifica o tamanho do arquivo de destino
+        if (source_file_size != dest_file_size):
+            os.remove(dest_file)
+            self.logger_.adiciona_linha_log(f'Cópia corrompida. Será copiado novamente no próximo sync. $error {source_file}') 
+            self.frame.zabbix_metric[0] = 1             
 
     def event_operations(self, filepath_source, path_dest, sync_name, event):
         """Método reproduzido quando um evento é detectado em algum diretório monitorado"""
         self.frame.status['evento_acontecendo'] = True
         self.frame.set_led1_orange()
+        
         while self.frame.status['sincronizando'] == True:
             time.sleep(0.1) 
         self.frame.set_led1_red()
+       
         try: 
             sync_ext = self.configs['folders_to_sync'][sync_name]['sync_extensions']
         except:
@@ -184,36 +218,14 @@ class FileOperations_():
             filename = str(os.path.basename(filepath_source)).lower()
             filepath_dest = os.path.join(path_dest, filename)
             if os.path.isfile(filepath_source) or os.path.isfile(filepath_dest):
-                if (os.path.splitext(filename)[1][1:].lower() in ' '.join(sync_ext).lower() or len(sync_ext) == 0):  # Se a extensao do arquivo estiver entre as sincronizadas  
+                if self.check_if_file_extension_is_set_to_be_synced(filepath_source, sync_ext):      
                     """Remoção de arquivos"""
-                    if not os.path.exists(filepath_source):         # Se o arquivo não existe na origem, apaga no destino
-                        try:
-                            os.remove(filepath_dest)
-                            self.logger_.adiciona_linha_log("Removido: " + str(filepath_dest))
-                        except Exception as err:
-                            self.logger_.adiciona_linha_log(str(err) + "$Error ao remover arquivo. " + str(filepath_dest))
-                            self.frame.zabbix_metric[0] = 1
-                            #self.frame.set_error_led()       
-                        """Cópia de arquivos"""
-                    elif not os.path.exists(filepath_dest):         # Se o arquivo não existe no destino, copia para o destino
-                        self.aguarda_liberar_arquivo(filepath_source)
-                        shutil.copy2(filepath_source, filepath_dest)
-                        self.logger_.adiciona_linha_log(f"Copiado: {filepath_source} [{os.path.getsize(str(filepath_source))} bytes] to {filepath_dest} [{os.path.getsize(str(filepath_dest))} bytes]")  
-                    else:                                           # Se o arquivo existe na origem e no destino:
-                        origem_size = os.path.getsize(str(filepath_source))     #verifica o tamanho do arquivo de origem
-                        destino_size = os.path.getsize(str(filepath_dest))      # verifica o tamanho do arquivo de destino
-                        source_mtime = os.stat(filepath_source).st_mtime        # verifica data de modificacao dos arquivos
-                        dest_mtime = os.stat(filepath_dest).st_mtime
-                        if source_mtime != dest_mtime or origem_size != destino_size:       # se o tamanho divergir ou a data de modificacao
-                            self.aguarda_liberar_arquivo(filepath_source)
-                            shutil.copy2(filepath_source, filepath_dest)               # realizacao uma sobrescrição
-                            destino_size = os.path.getsize(str(filepath_dest))      #atualiza tamanho do arquivo de destino
-                            self.logger_.adiciona_linha_log(f"Sobrescrito: {filepath_source} [{origem_size} bytes] to {filepath_dest} [{destino_size} bytes]")
-                            if (origem_size != destino_size):
-                                os.remove(filepath_dest)
-                                self.logger_.adiciona_linha_log(f'Cópia corrompida. Será copiado novamente no próximo sync. $error {filepath_source}') 
-                                self.frame.zabbix_metric[0] = 1
-                                #self.frame.set_error_led()
+                    self.remove_file_from_dest_if_not_source(filepath_source, filepath_dest)
+                       
+                    """Cópia de arquivos"""
+                    if not os.path.exists(filepath_dest):         # Se o arquivo não existe no destino, copia para o destino
+                        self.copy_file(filepath_source, filepath_dest)                        
+                    self.check_and_remove_if_both_files_are_not_same_size(filepath_source, filepath_dest)
             else:
                 self.logger_.adiciona_linha_log(f'Evento não tratado pois o arquivo não existe mais na pasta de origem nem na pasta de destino: {event}')    
             self.frame.panel_update()
@@ -224,53 +236,7 @@ class FileOperations_():
             self.frame.set_led1_cinza()
         self.frame.status['evento_acontecendo'] = False
 
+
 if __name__ == '__main__':
-    import wx
-
-    '''Carregando informações do diretório raiz do projeto'''
-    ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-
-    '''Carregando configurações...'''
-     
-    '''Variavel de status do sistema'''
-    status = {
-            'sincronizando' : False,
-            'evento_acontecendo' : False,
-        }
-
-    """Criando objeto de adição de registros de log"""
-    logger_ = FileLogger_(pasta_de_logs='logs')
-
-    '''Organizando parametros do zabbix'''
-#    zabbix_param = {
-#        'HOSTNAME' : configs['ZABBIX']['hostname'],
-#        'SERVER' : configs['ZABBIX']['zabbix_server'],
-#        'PORT' : int(configs['ZABBIX']['port']),
-#        'KEY' : configs['ZABBIX']['key'],
-#        'METRICS_INTERVAL' : int(configs['ZABBIX']['send_metrics_interval'])
-#    }
-
-    """Criando objeto de envio de metricas para o zabbix"""
- #   zsender = ZabbixSender_(
- #       metric_interval= zabbix_param['METRICS_INTERVAL'], 
- #       hostname= zabbix_param['HOSTNAME'], 
- #       key= zabbix_param['KEY'], 
- #       server= zabbix_param['SERVER'],
- #       port= zabbix_param['PORT'],
- #       idx= 0,
- #       metric= [0]
- #   )
-
-    """Inicializando a interface gráfica"""
-#    app = wx.App()  
-#    frame = MyFrame(status=status, logger_=logger_, zabbix_instance= zsender, configs=configs)       # Janela principal
-
-#    fileoperations_ = FileOperations_(configs, frame, logger_)
-#    fileoperations_.start_timesync_thread()
-#    while 1:
-#        pass
-#        time.sleep(1)
-#        fileoperations_.aguarda_liberar_arquivo('C:\\teste2\\doc.txt')
-#        print(fileoperations_.aguarda_liberar_arquivo.__name__)
-
+    pass
       

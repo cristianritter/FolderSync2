@@ -51,7 +51,7 @@ TERMOS DESTE CONTRATO, O CLIENTE NÃO PODERÁ USAR O SOFTWARE.
 
         info = wx.adv.AboutDialogInfo()
 
-        info.SetIcon(wx.Icon('about_icon.png', wx.BITMAP_TYPE_PNG))
+        info.SetIcon(wx.Icon('.\public\ico_small.png', wx.BITMAP_TYPE_PNG))
         info.SetName('FolderSync')
         info.SetVersion("1.2")
         info.SetDescription(description)
