@@ -83,6 +83,9 @@ class FileOperations_():
                 except Exception as Err:
                     self.logger_.adiciona_linha_log(f"$Error ao remover arquivo. Erro: {Err} Debug: {debug}")
             
+    def get_file_modification_timestamp(self):
+        pass
+
     def filter_file_extensions(self, files_list, file_extensions):
         pass
 
@@ -92,12 +95,16 @@ class FileOperations_():
             debug = 'remove files'   
             self.remove_files_from_dest_if_not_in_source(source, dest)
         
+
             debug = 'copy files'
+            thistime=round(time.time())
+            
             destfile_lastmodif_dict=dict()                # Contém a lista de arquivos da pasta de destino. ->    Key=filename, value=timeoflastmodification
             sourcefile_lastmodif_dict=dict()                     # Contém a lista de arquivos da pasta de origem.  ->    Key=filename, value=timeoflastmodification
+            
             destfile_lastmodif_dict = self.get_dict_files_list(dest, sync_extensions)
             sourcefile_lastmodif_dict = self.get_dict_files_list(source, sync_extensions)       
-            thistime=round(time.time())
+            
             for file in sourcefile_lastmodif_dict:
                 path_source = os.path.join(source, file)
                 path_dest = os.path.join(dest, file)
@@ -110,6 +117,7 @@ class FileOperations_():
                         self.logger_.adiciona_linha_log(f"Copiado: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")
                     else:                                       # Se existia adiciona informação de sobrescrita
                         self.logger_.adiciona_linha_log(f"Sobrescrito: {path_source} [{os.path.getsize(str(path_source))} bytes] to {path_dest} [{os.path.getsize(str(path_dest))} bytes.]")         
+                
                 if (round(time.time()) > ( thistime + 120) ):               # Passa para o próximo diretório caso a rotina passe de 2 minutos nesta pasta
                     return 0                                                # Retorna automaticamente no próximo ciclo
             return 0
