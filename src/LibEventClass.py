@@ -22,7 +22,7 @@ class Event(LoggingEventHandler):
             paths[1] = self.configs['folders_to_sync'][sync]['destino']
             
             if os.path.join(paths[0], '') == path_event_dir:
-                self.fileoperations.event_operations(path_event, paths[1], sync, event)
+                self.fileoperations.operation_fired_by_observer_event(path_event, paths[1], sync, event)
     
 
         

@@ -22,9 +22,6 @@ frame : MyFrame = [None]
 """Criando objeto de adição de registros de log"""
 logger_ = FileLogger_(frame, pasta_de_logs='./logs')
 
-'''Carregando informações do diretório raiz do projeto'''
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
-
 '''Carregando configurações...'''
 config_filepath = './user/config.json'
 if os.path.isfile(config_filepath):
