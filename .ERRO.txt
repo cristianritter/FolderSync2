@@ -1,1 +1,0 @@
-$Error carregando arquivo json. Filename: ./user/config.json, Erro: [Errno 2] No such file or directory: './user/config.json'
