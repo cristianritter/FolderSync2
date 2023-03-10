@@ -11,24 +11,20 @@ from watchdog.observers import Observer
 import wx.adv
 import wx
 
-'''Criando variaveis utilizadas pelo sistema'''     
-status = {                              # Evita que multiplos eventos ocorram ao mesmo tempo, causando falhas
+'''Carregando configurações...'''
+conf_file = './user/config.json'
+configs = FileOperations_.read_json_from_file(None, conf_file)
+
+'''Definindo Variáveis'''     
+status = {                              # Armazena flags de estado 
         'sincronizando' : False,
         'evento_acontecendo' : False
     }
-zabbix_metric = [0]                      #Variavel que carrega as metricas do zabbix
+zabbix_metric = [0]                      #Armazena metrica do zabbix (0 means no errors)
 frame : MyFrame = [None]
 
-"""Criando objeto de adição de registros de log"""
+"""Instanciando objeto de adição de registros de log"""
 logger_ = FileLogger_(frame, pasta_de_logs='./logs')
-
-'''Carregando configurações...'''
-config_filepath = './user/config.json'
-if os.path.isfile(config_filepath):
-    configs = FileOperations_.read_json_from_file(None, config_filepath)
-else:
-    logger_.adiciona_linha_log(f" Configuration file 'Config.json' was not found.")
-    raise FileNotFoundError(f" Configuration file 'config.json' was not found.")
 
 """Criando instancias de envio de metricas para o zabbix"""
 try:
@@ -50,8 +46,8 @@ except Exception as Err:
 """Inicializando a interface gráfica"""
 try:
     app = wx.App()                                                                                      # Criação da aplicação wxpython
-    frame[0] = MyFrame(status=status, logger_=logger_, zabbix_metric=zabbix_metric, configs=configs)       # Criação da janela principal d aplicativo
-    TaskBarIcon(frame[0], configs)                                                                     # Criação do ícone de bandeja
+    frame[0] = MyFrame(status=status, logger_=logger_, zabbix_metric=zabbix_metric, configs=configs)    # Criação da janela principal d aplicativo
+    TaskBarIcon(frame[0], configs)                                                                      # Criação do ícone de bandeja
 except Exception as Err:
     logger_.adiciona_linha_log(f"$Error: {Err} - Erro ao criar a interface gráfica da aplicação wxpython.")
     

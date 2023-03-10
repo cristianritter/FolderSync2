@@ -21,8 +21,12 @@ class FileOperations_():
                 data = json.load(infile)
             return data
         except Exception as Err:
-            print(f'$Error carregando arquivo json. Filename: {filename}, Erro: {Err}')
-            return 0
+            ExceptionMsg = f'$Error carregando arquivo json. Filename: {filename}, Erro: {Err}'
+            with open('.ERRO.txt', "w") as file:
+                file.write(f'{ExceptionMsg}\n')
+            raise FileNotFoundError(ExceptionMsg)
+
+
 
     def wait_for_the_file_to_be_get_ready_for_copy(self, filepath_source):
         """Método que verifica se a criação do arquivo já foi finalizada antes de executar a cópia \n
