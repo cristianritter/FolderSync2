@@ -1,6 +1,6 @@
 # FolderSync
 
-![Interface do Usuário](caminho/para/imagem/interface.png)
+![Interface do Usuário](https://github.com/cristianritter/FolderSync2/blob/master/interface.png)
 
 ## Descrição
 
